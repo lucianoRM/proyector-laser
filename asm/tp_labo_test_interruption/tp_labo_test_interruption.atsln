@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{18226A42-8477-4023-8AD2-40C49DA407C9}") = "tp_labo_test_interruption", "tp_labo_test_interruption\tp_labo_test_interruption.asmproj", "{1971A2C8-C319-4D30-B469-A19384A502F5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1971A2C8-C319-4D30-B469-A19384A502F5}.Debug|AVR.ActiveCfg = Debug|AVR
+		{1971A2C8-C319-4D30-B469-A19384A502F5}.Debug|AVR.Build.0 = Debug|AVR
+		{1971A2C8-C319-4D30-B469-A19384A502F5}.Release|AVR.ActiveCfg = Release|AVR
+		{1971A2C8-C319-4D30-B469-A19384A502F5}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
