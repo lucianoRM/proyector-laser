@@ -93,11 +93,11 @@ configurar_timer:
 	call reset_timer
 
 	;cargo la configuracion del timer 1, modo normal, sin prescaler
-	clr r0
-	sts TCCR1A, r0
+	clr r20
+	sts TCCR1A, r20
 
-	ldi r0, 1 << CS10
-	sts TCCR1B, r0
+	ldi r20, 1 << CS10
+	sts TCCR1B, r20
 
 	ret	
 
