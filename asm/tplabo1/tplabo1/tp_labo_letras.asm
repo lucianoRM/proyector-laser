@@ -13,12 +13,12 @@ cadena:
 	.dw grafico
 	.dw grafico
 	.dw grafico
-	.dw letra_a
-	.dw letra_a
-	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_b
-	.dw letra_b
+	.dw grafico
+	.dw grafico
+	.dw grafico
+	.dw grafico
+	.dw grafico
+	.dw grafico
 	.dw grafico
 	.dw grafico
 	.dw grafico

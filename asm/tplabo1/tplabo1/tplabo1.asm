@@ -101,6 +101,9 @@ configurar_timer:
 	ldi r20, 1 << CS10
 	sts TCCR1B, r20
 
+	ldi r30,0 ; CONTADOR DE FILA
+	ldi r29,0 ;
+
 	ret	
 
 ; resetea el timer 1 (16bit)
@@ -155,30 +158,57 @@ dibujar:
 	ldi r23, 0; alta
 	mov r24, r20; baja
 
+	
+
+
 	loop_dibujar:
 		/*sbrc r21, 3	; salteo si el bit 2 de la fila esta seteado
 		jmp dibujar_end*/
 
 		mov r1, r21					; pasaje de parametros
 		mov r2, r22
-		jmp rutina_dibujar
+		//jmp rutina_dibujar
 
 		vuelta:
 
 		; dibujar el pixel TODO, pasarle la fila y la columna
 		; deberia prender una fila y otra no
+		clr r0
+		mov r31,r30
+		lsr r31
+		lsr r31
+		lsr r31
+		lsr r31
+		
+		
 
+		cp r21, r31
+		breq print1
+print0:
+		out PORTB, r0
+		jmp esperar
+print1:
+		inc r0
 		out PORTB, r0
 
+esperar:
 		; obtengo el valor actual del timer
 		lds r17, TCNT1L
 		lds r16, TCNT1H
 
-		cp r16, r23
+		cp r23, r16
+		brmi mayor
+		brne esperar
+		cp r24, r17
+		brmi mayor
+		jmp esperar
+		
+		
+		/*cp r16, r23
 		brmi loop_dibujar ; si r16 - r23 < 0 => la parte alta de timer_actual es menor
 		brne mayor; si no es cero entonces ya puedo ver el contenido del if
 		cp r17, r24; caso en que las partes altas son iguales
-		brmi loop_dibujar; miro las partes bajas y las comparo
+		brmi loop_dibujar; miro las partes bajas y las comparo*/
 
 		mayor:
 			inc r22; columna++
@@ -192,12 +222,20 @@ dibujar:
 			brne loop_dibujar
 			; si columna == 2^7 == 128
 			inc r21; fila++
+			inc r29;
+			brne salto2;
+			inc r30; CONTADOR++
+		salto2:
 			ldi r22, 0; columna = 0
+			cpi r21, 8
+			breq dibujar_end
 
 		jmp loop_dibujar
 
 	; bucle por las dudas
 	dibujar_end:
+		clr r0
+		out PORTB, r0
 		jmp dibujar_end
 
 ;---------- definicion de interrupciones ----------
