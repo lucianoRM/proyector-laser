@@ -16,10 +16,7 @@
 .org INT0addr			;ubicacion de la external interrupt 0 (INT0 -> PORTD2)
 	jmp sensor	;routina llamada por la interrupcion externa para el sensor hall
 
-ultima_duracion_vuelta_h:
-	.dw 0x00
-ultima_duracion_vuelta_l:
-	.dw 0x00
+.include "tp_labo_letras.asm"
 
 main:
 	
@@ -30,7 +27,7 @@ main:
 	out SPL, r20
 
 	call iniciar_fan
-	call esperar_fan
+	//call esperar_fan
 	call configurar_laser
 	call configurar_timer
 	call configurar_interrupcion
@@ -76,8 +73,8 @@ configurar_laser:
 ;configura la interrupcion del sensor
 configurar_interrupcion:
 	;configuracion de interrupcion
-	;seteo la interrupcion externa para que se active con flanco descendente
-	ldi r20, 1<<ISC01
+	;seteo la interrupcion externa para que se active con flanco ascendente
+	ldi r20, (1<<ISC01) | (1 <<ISC00)
 	sts EICRA, r20; EICRA esta mapeado en memoria, inconsistencias de avr (?)
 
 	;habilito la interrupción INT0 (PORTD2)
@@ -143,7 +140,7 @@ dibujar:
 	*/
 
 	;lds r20, ultima_duracion_vuelta_l innecesario
-	lds r20, ultima_duracion_vuelta_h
+	mov r20, r9
 
 	; shift a la derecha 2 veces
 	lsr r20
@@ -159,13 +156,19 @@ dibujar:
 	mov r24, r20; baja
 
 	loop_dibujar:
-		sbrc r21, 2	; salteo si el bit 2 de la fila esta seteado
-		jmp dibujar_end
+		/*sbrc r21, 3	; salteo si el bit 2 de la fila esta seteado
+		jmp dibujar_end*/
+
+		mov r1, r21					; pasaje de parametros
+		mov r2, r22
+		jmp rutina_dibujar
+
+		vuelta:
 
 		; dibujar el pixel TODO, pasarle la fila y la columna
-		; laser prueba
 		; deberia prender una fila y otra no
-		out PORTB, r22
+
+		out PORTB, r0
 
 		; obtengo el valor actual del timer
 		lds r17, TCNT1L
@@ -181,8 +184,8 @@ dibujar:
 			inc r22; columna++
 
 			;t_prox_cambio += delta
-			add r24, r20; sumo partes bajas
 			ldi r25, 0
+			add r24, r20; sumo partes bajas
 			adc r23, r25; le sumo a la parte alta el carry de la sumas de la partes bajas
 
 			cpi r22, 128
@@ -199,13 +202,9 @@ dibujar:
 
 ;---------- definicion de interrupciones ----------
 sensor:
-	; obtengo el valor actual del timer
-	lds r20, TCNT1L
-	lds r21, TCNT1H
-
-	; actualizo el ultimo valor de la vuelta
-	sts ultima_duracion_vuelta_l, r20
-	sts ultima_duracion_vuelta_h, r21
+	; obtengo el valor actual del timer y actualizo
+	lds r8, TCNT1L;innecesario
+	lds r9, TCNT1H
 
 	; reseteo el timer
 	call reset_timer
