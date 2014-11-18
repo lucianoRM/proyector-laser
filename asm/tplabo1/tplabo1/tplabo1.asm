@@ -90,16 +90,14 @@ configurar_interrupcion:
 configurar_timer:
 	;timer
 	;cargo valor inicial del timer en 1 (parte alta y baja)
-	ldi r20, 0x00
-	sts TCNT1H, r20
-	sts TCNT1L, r20
+	call reset_timer
 
 	;cargo la configuracion del timer 1, modo normal, sin prescaler
-	ldi r20, 0x00
-	sts TCCR1A, r20
+	clr r0
+	sts TCCR1A, r0
 
-	ldi r20, 1 << CS10
-	sts TCCR1B, r20
+	ldi r0, 1 << CS10
+	sts TCCR1B, r0
 
 	ret	
 
@@ -107,9 +105,9 @@ configurar_timer:
 reset_timer:
 	;timer
 	;cargo valor inicial del timer en 1 (parte alta y baja)
-	ldi r20, 0x00
-	sts TCNT1H, r20
-	sts TCNT1L, r20
+	clr r0
+	sts TCNT1H, r0
+	sts TCNT1L, r0
 
 	ret
 
@@ -117,15 +115,15 @@ reset_timer:
 dibujar:
 
 	/*
-	t = tiempo que tarda en dar una vuelta		0 <= t <= 2^16				2 byte
+	t = tiempo que tarda en pasar un lado		0 <= t <= 2^16				2 byte
 	t_prox_cambio = delta													2 byte			r23:r24
 
-	delta = t / 8 / 128							0 <= delta <= 2^6			1 byte			r20
-												;dividimos por 8 lados y 128 pixeles por lado
+	delta = t / 128							0 <= delta <= 2^6			1 byte			r20
+												;dividimos por 128 pixeles por lado
 	fila = 0									0 <= fila <= 2^3 - 1		1 byte			r21
 	columna = 0									0 <= columna <= 2^7 - 1		1 byte			r22
 
-	while(fila < 2^3 && columna < 2^7)
+	while(true)
 
 		dibujar_pixel(fila, columna) ; falta ver como skippear las primeras columnas y las ultimas por las dudas
 
@@ -133,68 +131,47 @@ dibujar:
 			columna++
 			t_prox_cambio += delta
 
-			if (columna == 2^7)
-				fila++
-				columna = 0
-
 	*/
 
-	;lds r20, ultima_duracion_vuelta_l innecesario
-	mov r20, r9
-
-	; shift a la derecha 2 veces
-	lsr r20
-	lsr r20
-
-	; numero de fila
-	ldi r21, 0;
 	; numero de columna
 	ldi r22, 0;
 
-	; t_prox_cambio = delta
-	ldi r23, 0; alta
-	mov r24, r20; baja
+	; delta = r8:r9
+		mov r0, r9
+		lsl r0				; r0[1:7] = old_r9[0:6] y r0[0] = 0
+		sbrc r8, 7
+		inc r0				; r0[0] = old_r8[7]
+		mov r8, r0			; r8[0] = old_r8[7] y r8[1:7] = old_r9[0:6]
+	
+		clr r0
+		sbrc r9, 7
+		inc r0				; r0[0] = old_r9[7] y r0[1:7] = 0
+		mov r9, r0			; r9[0] = old_r9[7] y r9[1:7] = 0
 
-	loop_dibujar:
-		/*sbrc r21, 3	; salteo si el bit 2 de la fila esta seteado
-		jmp dibujar_end*/
-
+loop_dibujar:
 		mov r1, r21					; pasaje de parametros
 		mov r2, r22
 		jmp rutina_dibujar
 
-		vuelta:
-
-		; dibujar el pixel TODO, pasarle la fila y la columna
-		; deberia prender una fila y otra no
-
+vuelta:
 		out PORTB, r0
-
+		
+esperar:
 		; obtengo el valor actual del timer
-		lds r17, TCNT1L
-		lds r16, TCNT1H
+		lds r10, TCNT1L
+		lds r11, TCNT1H
 
-		cp r16, r23
-		brmi loop_dibujar ; si r16 - r23 < 0 => la parte alta de timer_actual es menor
-		brne mayor; si no es cero entonces ya puedo ver el contenido del if
-		cp r17, r24; caso en que las partes altas son iguales
-		brmi loop_dibujar; miro las partes bajas y las comparo
+		cp r9, r11
+		brmi proxima_columna
+		brne esperar
+		cp r8, r10
+		brmi proxima_columna
+		jmp esperar
 
-		mayor:
-			inc r22; columna++
-
-			;t_prox_cambio += delta
-			ldi r25, 0
-			add r24, r20; sumo partes bajas
-			adc r23, r25; le sumo a la parte alta el carry de la sumas de la partes bajas
-
-			cpi r22, 128
-			brne loop_dibujar
-			; si columna == 2^7 == 128
-			inc r21; fila++
-			ldi r22, 0; columna = 0
-
-		jmp loop_dibujar
+	proxima_columna:
+		inc r22
+		cpi r22, 128
+		brne loop_dibujar
 
 	; bucle por las dudas
 	dibujar_end:
@@ -203,11 +180,18 @@ dibujar:
 ;---------- definicion de interrupciones ----------
 sensor:
 	; obtengo el valor actual del timer y actualizo
-	lds r8, TCNT1L;innecesario
+	lds r8, TCNT1L
 	lds r9, TCNT1H
 
 	; reseteo el timer
 	call reset_timer
+
+	inc r21					; incremento el nro de fila
+	cpi r21, 8
+	brne continue
+	clr r21					; si la fila == 8 => fila = 0
+	
+continue:
 	
 	sei
 

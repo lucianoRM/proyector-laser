@@ -21,12 +21,12 @@ main:
 	out SPL, r20
 
 	ldi r16, 0xFF
-	out DDRC, r16
-	out PORTC, r16
+	out DDRB, r16
+	out PORTB, r16
 
 	;configuracion de interrupcion
 	;seteo la interrupcion externa para que se active con flanco descendente
-	ldi r20, 1<<ISC01
+	ldi r20, 1<<ISC01 | 1 <<ISC00
 	sts EICRA, r20; EICRA esta mapeado en memoria, inconsistencias de avr (?)
 
 	;habilito la interrupción INT0 (PORTD2)
@@ -43,10 +43,10 @@ here:
 ;definicion de interrupciones
 sensor:
 	; toggle del portb
-	in r21, PORTB
+	in r21, PORTC
 	ldi r22, 0xFF
 	eor r21, r22
-	out DDRB, r22
-	out PORTB, r21
+	out DDRC, r22
+	out PORTC, r21
 
 	reti

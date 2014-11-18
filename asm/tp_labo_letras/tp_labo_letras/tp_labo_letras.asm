@@ -6,10 +6,16 @@
  */ 
 
 cadena:
-	.db 2, 0x00				; len(text)
+	.db 8, 0x00				; len(text)
 	.dw letra_a
 	.dw letra_b
-
+	.dw letra_a
+	.dw letra_b
+	.dw letra_a
+	.dw letra_b
+	.dw letra_a
+	.dw letra_b
+	clr r0
 letra_espacio:
 	.db 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000
 letra_a:
@@ -29,8 +35,10 @@ function dibujar (fila, columna, offsetColumna) {
 }
 */
 
+//r0 = bit on/off para el laser
 //r1 = fila, r2 = columna, r3 = offsetColumna
-dibujar:
+//utiliza r0:r6 r28:r31
+rutina_dibujar:
 	; Se shiftea uno hacia la izquierda para multiplicar por 2
 	; El direccionamiento de las etiquetas es a Word, o sea a 2 bytes
 	; En cambio, lpm utiliza direccionamiento a byte
@@ -77,3 +85,15 @@ dibujar:
 
 	//TODO DIBUJAR POSTA
 	//bit = r6[columna mod 8 + offsetColumna mod 8]
+	ldi r31, 0b00000111
+	and r2, r31
+	loop:	tst r2
+			breq obtener_bit
+			dec r2
+			lsl r6
+			jmp loop
+	obtener_bit:
+			clr r0
+			sbrc r6, 7
+			inc r0
+	//jmp vuelta
