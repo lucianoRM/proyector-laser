@@ -8,27 +8,25 @@
 cadena:
 	.db 16, 0x00				; len(text)
 	.dw letra_espacio
+	.dw letra_bloque
 	.dw letra_espacio
+	.dw letra_bloque
 	.dw letra_espacio
+	.dw letra_bloque
 	.dw letra_espacio
+	.dw letra_bloque
 	.dw letra_espacio
+	.dw letra_bloque
 	.dw letra_espacio
+	.dw letra_bloque
 	.dw letra_espacio
+	.dw letra_bloque
 	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_espacio
-	.dw letra_espacio
+	.dw letra_bloque
 	//clr r0
-grafico:
-	.db 0b00000000, 0b00000000, 0b00000000, 0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000
 letra_espacio:
 	.db 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000
-letra_cuadrado:
+letra_bloque:
 	.db 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111
 letra_a:
 	.db 0b00011000, 0b00100100, 0b01000010, 0b01000010, 0b01111110, 0b01000010, 0b01000010, 0b01000010
@@ -48,7 +46,7 @@ function dibujar (fila, columna, offsetColumna) {
 */
 
 //r0 = bit on/off para el laser
-//r1 = fila, r2 = columna, r3 = offsetColumna
+//r23 = fila, r24 = columna, r3 = offsetColumna
 //utiliza r0:r6 r28:r31
 rutina_dibujar:
 	; Se shiftea uno hacia la izquierda para multiplicar por 2
@@ -61,19 +59,21 @@ rutina_dibujar:
 	
 	//r0 = count(letras)
 	//Z = &(letras[0])
-	lpm r4, Z+				; r4 = count(letras)
-	inc ZL					; padding
+	lpm r6, Z+				; r6 = count(letras)
+	
+	lpm r0, Z+
+
 
 	//TODO offsetColumna
 	//Z += floor(offsetColumna / 8) + floor(columna / 8)
 	//Z = &(&letra_a_imprimir)
-		//r5 = 2*floor(columna/8) ;cada registro ocupa 2 bytes y cada letra tiene 8 pixeles de ancho
-		mov r5, r2
-		lsr r5
-		lsr r5
+		//r7 = 2*floor(columna/8) ;cada registro ocupa 2 bytes y cada letra tiene 8 pixeles de ancho
+		mov r7, r24
+		lsr r7
+		lsr r7
 		//Z += 2*floor(columna/8)
 		clr r0
-		add r30, r5
+		add r30, r7
 		adc r31, r0
 
 	//r28:r29 = &letra_a_imprimir
@@ -89,7 +89,7 @@ rutina_dibujar:
 
 	//Z = &fila_letra_a_imprimir = &letra_a_imprimir + fila
 	clr r0
-	add r30,r1
+	add r30,r23
 	adc r31,r0
 
 	//r6 = fila_letra_a_imprimir
@@ -98,10 +98,10 @@ rutina_dibujar:
 	//TODO DIBUJAR POSTA
 	//bit = r6[columna mod 8 + offsetColumna mod 8]
 	ldi r31, 0b00000111
-	and r2, r31
-	loop:	tst r2
+	and r24, r31
+	loop:	tst r24
 			breq obtener_bit
-			dec r2
+			dec r24
 			lsl r6
 			jmp loop
 	obtener_bit:

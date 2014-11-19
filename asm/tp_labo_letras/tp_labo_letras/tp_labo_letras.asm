@@ -6,7 +6,7 @@
  */ 
 
 cadena:
-	.db 8, 0x00				; len(text)
+	.db 16, 0x00				; len(text)
 	.dw letra_a
 	.dw letra_b
 	.dw letra_a
@@ -15,7 +15,15 @@ cadena:
 	.dw letra_b
 	.dw letra_a
 	.dw letra_b
-	clr r0
+	.dw letra_a
+	.dw letra_b
+	.dw letra_a
+	.dw letra_b
+	.dw letra_a
+	.dw letra_b
+	.dw letra_a
+	.dw letra_b
+	//clr r0
 letra_espacio:
 	.db 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000
 letra_a:
@@ -35,9 +43,17 @@ function dibujar (fila, columna, offsetColumna) {
 }
 */
 
-//r0 = bit on/off para el laser
-//r1 = fila, r2 = columna, r3 = offsetColumna
-//utiliza r0:r6 r28:r31
+/*
+r6 = count(letras)
+r7
+r23 = fila (param)
+r24 = columna (param)
+r25 = offsetColumna (param)
+r28
+r29
+r30
+r31
+*/
 rutina_dibujar:
 	; Se shiftea uno hacia la izquierda para multiplicar por 2
 	; El direccionamiento de las etiquetas es a Word, o sea a 2 bytes
@@ -49,7 +65,7 @@ rutina_dibujar:
 	
 	//r0 = count(letras)
 	//Z = &(letras[0])
-	lpm r4, Z+				; r4 = count(letras)
+	lpm r6, Z+				; r6 = count(letras)
 	inc ZL					; padding
 
 	//TODO offsetColumna

@@ -24,7 +24,7 @@
 .org INT0addr			;ubicacion de la external interrupt 0 (INT0 -> PORTD2)
 	jmp sensor	;routina llamada por la interrupcion externa para el sensor hall
 
-//.include "tp_labo_letras.asm"
+.include "tp_labo_letras.asm"
 
 main:
 	sbi DDRC, 1	;configuro como salida el led rojo
@@ -109,7 +109,7 @@ reset_timer:
 
 ; prende y apaga el laser segun el valor actual del laser. No hace falta ret, pues viene de un jmp
 dibujar:
-	cpi r21, 1
+	cpi r21, 0
 	brne led0
 	sbi PORTC, 1
 	jmp dsps
@@ -130,24 +130,11 @@ dibujar:
 	
 	
 dibujar_columna:
-	//Pinto fila 0
-	clr r0;
-	
-	cpi r21,0
-	breq sacar1;
-	cpi r21,2
-	breq sacar1;
-	cpi r21,4
-	breq sacar1;
-	cpi r21,6
-	breq sacar1;
-	
+	mov r23, r21
+	mov r24, r22
+	jmp rutina_dibujar
+vuelta:
 	out PORTB,r0
-	jmp postpintar
-sacar1:
-	inc r0;
-	out PORTB,r0;
-	postpintar:
 
 check_time:
 	lds r1,TCNT1L
