@@ -7,25 +7,25 @@
 
 cadena:
 	.db 16, 0x00				; len(text)
-	.dw grafico
-	.dw grafico
-	.dw grafico
-	.dw grafico
-	.dw grafico
-	.dw grafico
-	.dw letra_a
-	.dw letra_a
 	.dw letra_espacio
 	.dw letra_espacio
-	.dw letra_b
-	.dw letra_b
-	.dw grafico
-	.dw grafico
-	.dw grafico
-	.dw grafico
-	clr r0
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	//clr r0
 grafico:
-	.db 0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000
+	.db 0b00000000, 0b00000000, 0b00000000, 0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000
 letra_espacio:
 	.db 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000
 letra_cuadrado:

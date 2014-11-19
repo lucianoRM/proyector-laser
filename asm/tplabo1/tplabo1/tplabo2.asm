@@ -27,8 +27,7 @@
 //.include "tp_labo_letras.asm"
 
 main:
-	sbi DDRC, 1	;configuro como salida el led rojo
-	sbi DDRC, 2	;configuro como salida el led verde
+	
 	;inicializacion stack
 	ldi r20, high(RAMEND)
 	out SPH, r20
@@ -67,7 +66,6 @@ configurar_laser:
 configurar_interrupcion:
 	clr r21			; limpio fila
 	clr r22			; limpio columna
-
 	;configuracion de interrupcion
 	;seteo la interrupcion externa para que se active con flanco ascendente
 	ldi r20, (1<<ISC01) | (1 <<ISC00)
@@ -109,13 +107,6 @@ reset_timer:
 
 ; prende y apaga el laser segun el valor actual del laser. No hace falta ret, pues viene de un jmp
 dibujar:
-	cpi r21, 1
-	brne led0
-	sbi PORTC, 1
-	jmp dsps
-	led0:
-	cbi PORTC, 1
-	dsps:
 
 	clr r22; Columnas
 
@@ -123,7 +114,6 @@ dibujar:
 	//se inicializa con r3=tiempo que tengo que estar pintando una columna
 	clr r4 ; Parte alta de la suma de deltas de tiempo
 	mov r3,r2 ; r3 se queda con el delta de tiempo entre columnas.Es la parte alta directamente porque es tiempo/256.
-	mov r5, r3
 
 	//En este momento el tiempo a pintar sobre cada lado del par entre interrupciones esta en r2.
 	
@@ -132,22 +122,12 @@ dibujar:
 dibujar_columna:
 	//Pinto fila 0
 	clr r0;
-	
 	cpi r21,0
-	breq sacar1;
-	cpi r21,2
-	breq sacar1;
-	cpi r21,4
-	breq sacar1;
-	cpi r21,6
-	breq sacar1;
-	
-	out PORTB,r0
-	jmp postpintar
-sacar1:
+	brne sacar0;
 	inc r0;
+sacar0:
 	out PORTB,r0;
-	postpintar:
+
 
 check_time:
 	lds r1,TCNT1L
@@ -162,18 +142,14 @@ check_time:
 
 
 proxima_columna:
-	clr r0
-	add r3, r5
-	adc r4, r0
-
-	cpi r16, 1						; si sos el segundo espejo, espera
+	cpi r16, 1
 	breq wait_for_interruption
-	inc r22							; incrementa nro de columna
-	cpi r22, 128					; si no te pasaste, dibujala
+	inc r16
+	inc r22;
+	cpi r22, 128;
 	brne dibujar_columna;
-	inc r21							; si te pasaste, cambia el espejo
-	inc r16							; si sos el primer espejo, setea flag
-	jmp dibujar						; empeza a dibujar la otra fila
+	inc r21;
+	jmp dibujar;
 
 wait_for_interruption:
 	jmp wait_for_interruption
@@ -194,13 +170,13 @@ sensor:
 
 	cpi r16, 1
 	breq check_last_col
-	inc r21					; corrige nro de fila si no llego a pintar el segundo espejo
+	inc r21
 
 check_last_col:
 	clr r16						; limpio flag que indica si llego a pasar al segundo espejo
-	inc r21					; incremento el nro de fila
+	//inc r21					; incremento el nro de fila
 	cpi r21, 8
-	brmi continue
+	brne continue
 	clr r21					; si la fila == 8 => fila = 0
 	
 continue:

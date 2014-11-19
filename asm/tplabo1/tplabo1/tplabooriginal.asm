@@ -1,12 +1,4 @@
 /*
- * tplabo2.asm
- *
- *  Created: 11/18/2014 7:47:49 PM
- *   Author: Luciano
- */ 
-
-
- /*
  * tplabo1.asm
  *
  *  Created: 08/11/2014 9:53:07
@@ -24,11 +16,10 @@
 .org INT0addr			;ubicacion de la external interrupt 0 (INT0 -> PORTD2)
 	jmp sensor	;routina llamada por la interrupcion externa para el sensor hall
 
-//.include "tp_labo_letras.asm"
+.include "tp_labo_letras.asm"
 
 main:
-	sbi DDRC, 1	;configuro como salida el led rojo
-	sbi DDRC, 2	;configuro como salida el led verde
+	
 	;inicializacion stack
 	ldi r20, high(RAMEND)
 	out SPH, r20
@@ -54,6 +45,22 @@ iniciar_fan:
 
 	ret
 
+;rutina que espera que el fan tome velocidad
+esperar_fan:
+	clr r1
+	clr r2
+	clr r16
+
+	loop_esperar_fan:
+		inc r1
+		brne loop_esperar_fan
+		inc r2
+		brne loop_esperar_fan
+		inc r16
+		cpi r16, 76
+		brne loop_esperar_fan
+
+	ret
 
 ;configura el laser
 configurar_laser:
@@ -65,9 +72,6 @@ configurar_laser:
 
 ;configura la interrupcion del sensor
 configurar_interrupcion:
-	clr r21			; limpio fila
-	clr r22			; limpio columna
-
 	;configuracion de interrupcion
 	;seteo la interrupcion externa para que se active con flanco ascendente
 	ldi r20, (1<<ISC01) | (1 <<ISC00)
@@ -109,99 +113,98 @@ reset_timer:
 
 ; prende y apaga el laser segun el valor actual del laser. No hace falta ret, pues viene de un jmp
 dibujar:
-	cpi r21, 1
-	brne led0
-	sbi PORTC, 1
-	jmp dsps
-	led0:
-	cbi PORTC, 1
-	dsps:
 
-	clr r22; Columnas
+	/*
+	t = tiempo que tarda en pasar un lado		0 <= t <= 2^16				2 byte
+	t_prox_cambio = delta													2 byte			r23:r24
 
-	//r3:r4 contiene todo el tiempo el momento en el cual tengo que empezar a dibujar la prox columna
-	//se inicializa con r3=tiempo que tengo que estar pintando una columna
-	clr r4 ; Parte alta de la suma de deltas de tiempo
-	mov r3,r2 ; r3 se queda con el delta de tiempo entre columnas.Es la parte alta directamente porque es tiempo/256.
-	mov r5, r3
+	delta = t / 128							0 <= delta <= 2^6			1 byte			r20
+												;dividimos por 128 pixeles por lado
+	fila = 0									0 <= fila <= 2^3 - 1		1 byte			r21
+	columna = 0									0 <= columna <= 2^7 - 1		1 byte			r22
 
-	//En este momento el tiempo a pintar sobre cada lado del par entre interrupciones esta en r2.
+	while(true)
+
+		dibujar_pixel(fila, columna) ; falta ver como skippear las primeras columnas y las ultimas por las dudas
+
+		if (timer_actual > t_prox_cambio)
+			columna++
+			t_prox_cambio += delta
+
+	*/
+
+	; numero de columna
+	ldi r22, 0;
+
+	/*
+	; delta = r8:r9
+		mov r0, r9
+		lsl r0				; r0[1:7] = old_r9[0:6] y r0[0] = 0
+		sbrc r8, 7
+		inc r0				; r0[0] = old_r8[7]
+		mov r8, r0			; r8[0] = old_r8[7] y r8[1:7] = old_r9[0:6]
 	
-	
-	
-dibujar_columna:
-	//Pinto fila 0
-	clr r0;
-	
-	cpi r21,0
-	breq sacar1;
-	cpi r21,2
-	breq sacar1;
-	cpi r21,4
-	breq sacar1;
-	cpi r21,6
-	breq sacar1;
-	
-	out PORTB,r0
-	jmp postpintar
-sacar1:
-	inc r0;
-	out PORTB,r0;
-	postpintar:
+		clr r0
+		sbrc r9, 7
+		inc r0				; r0[0] = old_r9[7] y r0[1:7] = 0
+		mov r9, r0			; r9[0] = old_r9[7] y r9[1:7] = 0
+	*/
+	mov r8, r9
+	clr r9
 
-check_time:
-	lds r1,TCNT1L
-	lds r2,TCNT1H
-	cp r2,r4 ;comparo partes altas entre timer actual y suma de deltas(timer actual(HIGH) - suma de deltas(HIGH))
-	brmi check_time; Espero porque todavia no llegue al tiempo para la proxima columna
-	brpl proxima_columna;
-	cp r1,r3 ;comparo partes bajas
-	brmi check_time;
-	jmp proxima_columna;
+loop_dibujar:
+		mov r1, r21					; pasaje de parametros
+		mov r2, r22
+		//jmp rutina_dibujar
 
+vuelta:
+		clr r0
+		cpi r21, 0
+		brne sacar0
+		inc r0
+sacar0:
+		out PORTB, r0
+		
+esperar:
+		; obtengo el valor actual del timer
+		lds r10, TCNT1L
+		lds r11, TCNT1H
 
+		cp r9, r11
+		brmi proxima_columna
+		brne esperar
+		cp r8, r10
+		brmi proxima_columna
+		jmp esperar
 
-proxima_columna:
-	clr r0
-	add r3, r5
-	adc r4, r0
+	proxima_columna:
+		inc r22
+		cpi r22, 128
+		brmi loop_dibujar
+		inc r27
+		cpi r27, 2
+		breq dibujar_end
+		inc r21
+		jmp loop_dibujar
 
-	cpi r16, 1						; si sos el segundo espejo, espera
-	breq wait_for_interruption
-	inc r22							; incrementa nro de columna
-	cpi r22, 128					; si no te pasaste, dibujala
-	brne dibujar_columna;
-	inc r21							; si te pasaste, cambia el espejo
-	inc r16							; si sos el primer espejo, setea flag
-	jmp dibujar						; empeza a dibujar la otra fila
-
-wait_for_interruption:
-	jmp wait_for_interruption
-
-	
-
-
-
+	; bucle por las dudas
+	dibujar_end:
+		jmp dibujar_end
 
 ;---------- definicion de interrupciones ----------
 sensor:
 	; obtengo el valor actual del timer y actualizo
-	lds r1, TCNT1L
-	lds r2, TCNT1H
+	lds r8, TCNT1L
+	lds r9, TCNT1H
 
 	; reseteo el timer
 	call reset_timer
 
-	cpi r16, 1
-	breq check_last_col
-	inc r21					; corrige nro de fila si no llego a pintar el segundo espejo
-
-check_last_col:
-	clr r16						; limpio flag que indica si llego a pasar al segundo espejo
 	inc r21					; incremento el nro de fila
 	cpi r21, 8
-	brmi continue
+	brne continue
 	clr r21					; si la fila == 8 => fila = 0
+	clr r27
 	
 continue:
 	
