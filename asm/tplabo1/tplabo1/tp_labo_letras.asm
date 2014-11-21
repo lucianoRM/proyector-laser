@@ -8,21 +8,21 @@
 cadena:
 	.db 16, 0x00				; len(text)
 	.dw letra_bloque			;0
-	.dw letra_espacio			;1
+	.dw letra_bloque			;1
 	.dw letra_bloque			;2
-	.dw letra_espacio			;3
-	.dw letra_impar			;4
-	.dw letra_espacio			;5
-	.dw letra_par			;6
-	.dw letra_espacio			;7
-	.dw letra_impar			;8
-	.dw letra_espacio			;9
-	.dw letra_espacio			;10
-	.dw letra_espacio			;11
-	.dw letra_espacio			;12
-	.dw letra_espacio			;13
-	.dw letra_espacio			;14
-	.dw letra_espacio			;15
+	.dw letra_bloque			;3
+	.dw letra_bloque			;4
+	.dw letra_bloque			;5
+	.dw letra_bloque			;6
+	.dw letra_bloque			;7
+	.dw letra_bloque			;8
+	.dw letra_bloque			;9
+	.dw letra_bloque			;10
+	.dw letra_bloque			;11
+	.dw letra_bloque			;12
+	.dw letra_bloque			;13
+	.dw letra_bloque			;14
+	.dw letra_bloque			;15
 	//clr r0
 letra_impar:
 	.db 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111
@@ -51,7 +51,7 @@ function dibujar (fila, columna, offsetColumna) {
 
 //r0 = bit on/off para el laser
 //r23 = fila, r24 = columna, r3 = offsetColumna
-//utiliza r0, r6, r7, r23, r24, r28, r29, r30, r31
+//utiliza r0, r8, r7, r23, r24, r28, r29, r30, r31
 rutina_dibujar:
 	; Se shiftea uno hacia la izquierda para multiplicar por 2
 	; El direccionamiento de las etiquetas es a Word, o sea a 2 bytes
@@ -63,7 +63,7 @@ rutina_dibujar:
 	
 	//r0 = count(letras)
 	//Z = &(letras[0])
-	lpm r6, Z+				; r6 = count(letras)
+	lpm r8, Z+				; r8 = count(letras)
 	
 	lpm r0, Z+
 
@@ -98,20 +98,20 @@ rutina_dibujar:
 	add r30,r23
 	adc r31,r0
 
-	//r6 = fila_letra_a_imprimir
-	lpm r6, Z
+	//r8 = fila_letra_a_imprimir
+	lpm r8, Z
 
 	//TODO offsetColumna
-	//bit = r6[columna mod 8 + offsetColumna mod 8]
+	//bit = r8[columna mod 8 + offsetColumna mod 8]
 	ldi r31, 0b00000111
 	and r24, r31
 	loop:	tst r24
 			breq obtener_bit
 			dec r24
-			lsl r6
+			lsl r8
 			jmp loop
 	obtener_bit:
 			clr r0
-			sbrc r6, 7
+			sbrc r8, 7
 			inc r0
 	jmp vuelta
