@@ -122,7 +122,55 @@ reset_timer:
 ; en r3:r4 debe estar el tiempo en el cual se debe pasar a la prox columna
 dibujar_lado:
 
-	clr r22; Columnas
+	clr r22; limpio columna
+
+	// acomodo los offsets de acuerdo a la columna que trato, se toca viendo las filas en la imagen
+	cpi r21, 0
+	breq offset_fila_0
+	cpi r21, 1
+	breq offset_fila_1
+	cpi r21, 2
+	breq offset_fila_2
+	cpi r21, 3
+	breq offset_fila_3
+	cpi r21, 4
+	breq offset_fila_4
+	cpi r21, 5
+	breq offset_fila_5
+	cpi r21, 6
+	breq offset_fila_6
+	cpi r21, 7
+	breq offset_fila_7
+	clr r22 //por las dudas
+
+	// valores elegidos para los offsets, depende de la posición del espejo/imanes
+	offset_fila_0:
+		ldi r16, 0
+		jmp set_offset
+	offset_fila_1:
+		ldi r16, 0
+		jmp set_offset
+	offset_fila_2:
+		ldi r16, 0
+		jmp set_offset
+	offset_fila_3:
+		ldi r16, 0
+		jmp set_offset
+	offset_fila_4:
+		ldi r16, 0
+		jmp set_offset
+	offset_fila_5:
+		ldi r16, 0
+		jmp set_offset
+	offset_fila_6:
+		ldi r16, 0
+		jmp set_offset
+	offset_fila_7:
+		ldi r16, 0
+		jmp set_offset
+
+	set_offset:
+		add r22, r16
 
 dibujar_columna:
 	mov r23, r21		; Pasaje de parámetros

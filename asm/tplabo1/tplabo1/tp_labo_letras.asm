@@ -15,7 +15,7 @@ cadena:
 	.dw letra_espacio			;5
 	.dw letra_espacio			;6
 	.dw letra_espacio			;7
-	.dw letra_a					;8
+	.dw letra_punteada			;8
 	.dw letra_espacio			;9
 	.dw letra_espacio			;10
 	.dw letra_espacio			;11
@@ -38,6 +38,8 @@ letra_b:
 	.db 0b01111100, 0b01000010, 0b01000010, 0b01111110, 0b01111110, 0b01000010, 0b01000010, 0b01111100
 letra_c:
 	.db 0b00111110, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b00111110
+letra_punteada:
+	.db 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010
 
 /*
 function dibujar (fila, columna, offsetColumna) {
