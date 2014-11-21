@@ -7,22 +7,22 @@
 
 cadena:
 	.db 16, 0x00				; len(text)
-	.dw letra_bloque			;0
-	.dw letra_bloque			;1
-	.dw letra_bloque			;2
-	.dw letra_bloque			;3
-	.dw letra_bloque			;4
-	.dw letra_bloque			;5
-	.dw letra_bloque			;6
-	.dw letra_bloque			;7
-	.dw letra_bloque			;8
-	.dw letra_bloque			;9
-	.dw letra_bloque			;10
-	.dw letra_bloque			;11
-	.dw letra_bloque			;12
-	.dw letra_bloque			;13
-	.dw letra_bloque			;14
-	.dw letra_bloque			;15
+	.dw letra_espacio			;0
+	.dw letra_espacio			;1
+	.dw letra_espacio			;2
+	.dw letra_espacio			;3
+	.dw letra_espacio			;4
+	.dw letra_espacio			;5
+	.dw letra_espacio			;6
+	.dw letra_espacio			;7
+	.dw letra_a					;8
+	.dw letra_espacio			;9
+	.dw letra_espacio			;10
+	.dw letra_espacio			;11
+	.dw letra_espacio			;12
+	.dw letra_espacio			;13
+	.dw letra_espacio			;14
+	.dw letra_espacio			;15
 	//clr r0
 letra_impar:
 	.db 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111
@@ -33,7 +33,7 @@ letra_espacio:
 letra_bloque:
 	.db 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111
 letra_a:
-	.db 0b00011000, 0b00100100, 0b01000010, 0b01000010, 0b01111110, 0b01000010, 0b01000010, 0b01000010
+	.db 0b01111110, 0b01111110, 0b01100110, 0b01100110, 0b01111110, 0b01111110, 0b01100110, 0b01100110
 letra_b:
 	.db 0b01111100, 0b01000010, 0b01000010, 0b01111110, 0b01111110, 0b01000010, 0b01000010, 0b01111100
 letra_c:

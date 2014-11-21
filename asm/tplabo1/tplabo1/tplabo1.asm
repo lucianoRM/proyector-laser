@@ -1,4 +1,4 @@
-// usa r0, r1, r2, r3, r4, r5, r16, r17, r20, r21, r22, r23, r24
+// usa r0, r1, r2, r3, r4, r5, r6, r16, r17, r20, r21, r22, r23, r24
 
 .include "m328Pdef.inc"
 
@@ -14,27 +14,27 @@
 .include "tp_labo_letras.asm"
 
 main:
-	clr r17				; limpio flag de primera sincronizacion
 	sbi DDRC, 1	;configuro como salida el led rojo
 	sbi DDRC, 2	;configuro como salida el led verde
+
 	;inicializacion stack
 	ldi r20, high(RAMEND)
 	out SPH, r20
 	ldi r20, low(RAMEND)
 	out SPL, r20
 
-	call iniciar_fan
-	call esperar_fan
+	call esperar_clock
 	call configurar_laser
 	call configurar_timer
 	call configurar_interrupcion
+	call iniciar_fan
 
 	;bucle principal, aca se ejecutan las interrupciones
 	main_loop:
 		jmp main_loop;
 
 ;---------- definicion de rutinas ----------
-esperar_fan:
+esperar_clock:
 	clr r1
 	clr r2
 	clr r16
@@ -45,15 +45,16 @@ esperar_fan:
 		inc r2
 		brne loop_esperar_fan
 		inc r16
-		cpi r16, 40
+		cpi r16, 10
 		brne loop_esperar_fan
-	sbi PORTC, 2
+
+	; pongo el clock en 8MHz
 	ldi r16, 0b10000000
 	sts CLKPR, r16
 	clr r16
 	sts CLKPR, r16
-	ret
 
+	ret
 
 ;configura como salida y activa el motor
 iniciar_fan:
@@ -62,7 +63,6 @@ iniciar_fan:
 	sbi PORTC, PIN_MOTOR; prendo el motor
 
 	ret
-
 
 ;configura el laser
 configurar_laser:
@@ -97,12 +97,11 @@ configurar_timer:
 	;cargo valor inicial del timer en 1 (parte alta y baja)
 	call reset_timer
 
-	;cargo la configuracion del timer 1, modo normal, sin prescaler
+	;cargo la configuracion del timer 1, modo normal, prescaler = 8
 	clr r20
 	sts TCCR1A, r20
 
-	;ldi r20, 1 << CS10
-	ldi r20, 0b00000010
+	ldi r20, 1 << CS10; 
 	sts TCCR1B, r20
 
 	ret	
@@ -130,12 +129,12 @@ dibujar_columna:
 	mov r24, r22
 	jmp rutina_dibujar
 vuelta:
-	out PORTB,r0
+	out PORTB, r0 // r0
 
 check_time:
-	lds r1,TCNT1L
-	lds r2,TCNT1H
-	cp r2,r4				; HIGH(tActual) - HIGH(tPasarProxCol)
+	lds r1, TCNT1L
+	lds r2, TCNT1H
+	cp r2, r4				; HIGH(tActual) - HIGH(tPasarProxCol)
 	brmi check_time			; HIGH(tActual) < HIGH(tPasarProxCol) => Vuelvo a chequear
 	brpl proxima_columna	; HIGH(tActual) > HIGH(tPasarProxCol) => Prox columna
 							
@@ -146,24 +145,15 @@ check_time:
 
 proxima_columna:
 	clr r0							; fijo nuevo límite de tiempo para la columna, sumando delta
-	add r3, r5						; LOW(tPasarProxCol) += delta
-	adc r4, r0						; HIGH(tPasarProxCol) += carry
+	add r3, r6						; LOW(tPasarProxCol) += delta
+	adc r4, r5						; HIGH(tPasarProxCol) += carry
 
 	inc r22							; columna ++
 	cpi r22, 128					
 	brmi dibujar_columna			; columna < 128 => dibujar
-									
+							
 									; si columna >= 128, tendrías que pasar a la siguiente fila, 
 									; pero sólo si acabas de terminar con el primer espejo
-
-	cpi r16, 1						; si es el segundo espejo del par el que acaba de terminar,
-	breq wait_for_interruption		; esperá a la interrupción (hiciste muy rápido)
-
-									; si es el primero
-	inc r21							; fila ++
-	clr r22							; columna = 0
-	inc r16							; flag = 1
-	jmp dibujar_columna				; dibujar
 
 wait_for_interruption:
 	cbi PORTB, 0					; dejo de pintar
@@ -177,36 +167,44 @@ sensor:
 	lds r2, TCNT1H
 
 	; reseteo el timer
-	call reset_timer
+	clr r0
+	sts TCNT1H, r0
+	sts TCNT1L, r0
 	
 	//r3:r4 contiene todo el tiempo el momento en el cual tengo que empezar a dibujar la prox columna
-	//se inicializa con r3=tiempo que tengo que estar pintando una columna
-	//r5 contiene el tiempo a incrementar entre columnas
-	clr r4 ; Parte alta de la suma de deltas de tiempo
-	mov r3,r2 ; r3 se queda con el delta de tiempo entre columnas.Es la parte alta directamente porque es tiempo/256.
-	mov r5, r3
+	//r6:r5 contiene el tiempo a incrementar entre columnas
 
-	cpi r16, 1
-	breq check_last_col
-	inc r21					; corrige nro de fila si no llego a pintar el segundo espejo
+	//necesito dividir por 128 = 2^7, me queda un bit en la parte alta, el resto en la parte baja
+	mov r5, r2
+	mov r6, r1
+	;aplico esto por 7 => OPTIMIZAR
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
 
-check_last_col:
-	clr r16					; limpio flag que indica si llego a pasar al segundo espejo
-	inc r21					; incremento el nro de fila
-	cpi r21, 8				
+	; copio partes altas y bajas
+	mov r4, r5
+	mov r3, r6
+
+	inc r21 ; incremento numero de fila
+
+	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
 	clr r21					; si la fila == 8 => fila = 0
 	
 continue:
-	
-	cpi r17, 1
-	breq continue2
-	inc r17
-	clr r21
 
-	
-
-continue2:
 	sei
 	jmp dibujar_lado
 	; reti ausente, acordarse de habilitar las interrupciones
