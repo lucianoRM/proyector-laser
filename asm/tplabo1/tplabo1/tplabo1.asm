@@ -180,14 +180,14 @@ vuelta:
 	out PORTB, r0 // r0
 
 check_time:
-	lds r1, TCNT1L
-	lds r2, TCNT1H
-	cp r2, r4				; HIGH(tActual) - HIGH(tPasarProxCol)
+	lds r18, TCNT1L
+	lds r19, TCNT1H
+	cp r19, r4				; HIGH(tActual) - HIGH(tPasarProxCol)
 	brmi check_time			; HIGH(tActual) < HIGH(tPasarProxCol) => Vuelvo a chequear
 	brpl proxima_columna	; HIGH(tActual) > HIGH(tPasarProxCol) => Prox columna
 							
 							; HIGH(tActual) == HIGH(tPasarProxCol)
-	cp r1,r3				; LOW(tActual) - LOW(tPasarProxCol)
+	cp r18,r3				; LOW(tActual) - LOW(tPasarProxCol)
 	brmi check_time			; LOW(tActual) < LOW(tPasarProxCol) => Vuelvo a chequear
 	jmp proxima_columna		; LOW(tActual) >= LOW(tPasarProxCol) => Prox columna
 
@@ -210,9 +210,16 @@ wait_for_interruption:
 ;---------- definicion de interrupciones ----------
 sensor:
 
+	;solo actualizo el tiempo entre los espejos una vez por vuelta si fila = 5
+	cpi r21, 5
+	brne continuar_igual
+
+	; si fila = 0, actualizo el valor del tiempo
 	; obtengo el valor actual del timer y actualizo
 	lds r1, TCNT1L
 	lds r2, TCNT1H
+
+	continuar_igual:
 
 	; reseteo el timer
 	clr r0

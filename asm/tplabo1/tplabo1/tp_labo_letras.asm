@@ -5,6 +5,7 @@
  *   Author: Carlos
  */ 
 
+//la cadena y las letras deben estar invertidas!
 cadena:
 	.db 16, 0x00				; len(text)
 	.dw letra_espacio			;0
@@ -13,11 +14,11 @@ cadena:
 	.dw letra_espacio			;3
 	.dw letra_espacio			;4
 	.dw letra_espacio			;5
-	.dw letra_espacio			;6
+	.dw letra_c					;6
 	.dw letra_espacio			;7
-	.dw letra_punteada			;8
+	.dw letra_b					;8
 	.dw letra_espacio			;9
-	.dw letra_espacio			;10
+	.dw letra_a					;10
 	.dw letra_espacio			;11
 	.dw letra_espacio			;12
 	.dw letra_espacio			;13
@@ -33,11 +34,11 @@ letra_espacio:
 letra_bloque:
 	.db 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111, 0b11111111
 letra_a:
-	.db 0b01111110, 0b01111110, 0b01100110, 0b01100110, 0b01111110, 0b01111110, 0b01100110, 0b01100110
+	.db 0b11111111, 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11111111, 0b11000011, 0b11000011
 letra_b:
-	.db 0b01111100, 0b01000010, 0b01000010, 0b01111110, 0b01111110, 0b01000010, 0b01000010, 0b01111100
+	.db 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11111111
 letra_c:
-	.db 0b00111110, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b00111110
+	.db 0b11111111, 0b11111111, 0b00000011, 0b00000011, 0b00000011, 0b00000011, 0b11111111, 0b11111111
 letra_punteada:
 	.db 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010
 
