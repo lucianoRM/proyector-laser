@@ -61,13 +61,9 @@ function dibujar (fila, columna, offsetColumna) {
 */
 
 //r0 = bit on/off para el laser
-//r23 = fila, r24 = columna, r3 = offsetColumna
-//utiliza r0, r8, r7, r23, r24, r28, r29, r30, r31
+//r23 = fila, r24 = columna, r25 = offsetColumna
+//utiliza r0, r8, r7, r23, r24, r25, r28, r29, r30, r31
 rutina_dibujar:
-	; Como se imprime de derecha a izquierda, cuando nos piden la columna 0 en realidad nos piden la 127
-	; Y cuando nos piden la columna 127 en realidad nos piden la 0
-
-
 	; Se shiftea uno hacia la izquierda para multiplicar por 2
 	; El direccionamiento de las etiquetas es a Word, o sea a 2 bytes
 	; En cambio, lpm utiliza direccionamiento a byte
@@ -92,7 +88,14 @@ rutina_dibujar:
 		lsr r7
 		lsr r7
 		lsl r7
-		//Z += 2*floor(columna/8)
+		//r0 = 2*floor(offsetColumna / 8)
+		mov r0, r25
+		lsr r0
+		lsr r0
+		lsr r0
+		lsl r0
+		add r7, r0
+		//Z += 2*floor(columna/8) + 2*floor(offsetColumna/8)
 		clr r0
 		add r30, r7
 		adc r31, r0
@@ -120,6 +123,9 @@ rutina_dibujar:
 	//bit = r8[columna mod 8 + offsetColumna mod 8]
 	ldi r31, 0b00000111
 	and r24, r31
+	mov r0, r25
+	and r0, r31
+	add r24, r0
 	loop:	tst r24
 			breq obtener_bit
 			dec r24

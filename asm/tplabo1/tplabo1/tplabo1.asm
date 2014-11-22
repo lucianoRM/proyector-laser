@@ -252,6 +252,7 @@ sensor:
 	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
 	clr r21					; si la fila == 8 => fila = 0
+	inc r25
 	
 continue:
 
