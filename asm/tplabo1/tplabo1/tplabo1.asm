@@ -97,7 +97,7 @@ configurar_timer:
 	;cargo valor inicial del timer en 1 (parte alta y baja)
 	call reset_timer
 
-	;cargo la configuracion del timer 1, modo normal, prescaler = 8
+	;cargo la configuracion del timer 1, modo normal, prescaler = 1
 	clr r20
 	sts TCCR1A, r20
 
@@ -145,28 +145,28 @@ dibujar_lado:
 
 	// valores elegidos para los offsets, depende de la posición del espejo/imanes
 	offset_fila_0:
-		ldi r16, 0
+		ldi r16, 2
 		jmp set_offset
 	offset_fila_1:
-		ldi r16, 0
+		ldi r16, 5
 		jmp set_offset
 	offset_fila_2:
-		ldi r16, 0
+		ldi r16, 4
 		jmp set_offset
 	offset_fila_3:
-		ldi r16, 0
+		ldi r16, 4
 		jmp set_offset
 	offset_fila_4:
-		ldi r16, 0
+		ldi r16, 1
 		jmp set_offset
 	offset_fila_5:
-		ldi r16, 0
+		ldi r16, 1
 		jmp set_offset
 	offset_fila_6:
-		ldi r16, 0
+		ldi r16, 2
 		jmp set_offset
 	offset_fila_7:
-		ldi r16, 0
+		ldi r16, 4
 		jmp set_offset
 
 	set_offset:
