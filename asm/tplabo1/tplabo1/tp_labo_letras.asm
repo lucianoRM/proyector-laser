@@ -64,6 +64,10 @@ function dibujar (fila, columna, offsetColumna) {
 //r23 = fila, r24 = columna, r3 = offsetColumna
 //utiliza r0, r8, r7, r23, r24, r28, r29, r30, r31
 rutina_dibujar:
+	; Como se imprime de derecha a izquierda, cuando nos piden la columna 0 en realidad nos piden la 127
+	; Y cuando nos piden la columna 127 en realidad nos piden la 0
+
+
 	; Se shiftea uno hacia la izquierda para multiplicar por 2
 	; El direccionamiento de las etiquetas es a Word, o sea a 2 bytes
 	; En cambio, lpm utiliza direccionamiento a byte

@@ -122,7 +122,7 @@ reset_timer:
 ; en r3:r4 debe estar el tiempo en el cual se debe pasar a la prox columna
 dibujar_lado:
 
-	clr r22; limpio columna
+	ldi r22, 127
 
 	// acomodo los offsets de acuerdo a la columna que trato, se toca viendo las filas en la imagen
 	cpi r21, 0
@@ -141,7 +141,6 @@ dibujar_lado:
 	breq offset_fila_6
 	cpi r21, 7
 	breq offset_fila_7
-	clr r22 //por las dudas
 
 	// valores elegidos para los offsets, depende de la posición del espejo/imanes
 	offset_fila_0:
@@ -170,7 +169,7 @@ dibujar_lado:
 		jmp set_offset
 
 	set_offset:
-		add r22, r16
+		sub r22, r16
 
 dibujar_columna:
 	mov r23, r21		; Pasaje de parámetros
@@ -196,12 +195,8 @@ proxima_columna:
 	add r3, r6						; LOW(tPasarProxCol) += delta
 	adc r4, r5						; HIGH(tPasarProxCol) += carry
 
-	inc r22							; columna ++
-	cpi r22, 128					
-	brmi dibujar_columna			; columna < 128 => dibujar
-							
-									; si columna >= 128, tendrías que pasar a la siguiente fila, 
-									; pero sólo si acabas de terminar con el primer espejo
+	dec r22							; columna --
+	brpl dibujar_columna			; columna >= 0 => dibujar
 
 wait_for_interruption:
 	cbi PORTB, 0					; dejo de pintar
