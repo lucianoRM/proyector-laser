@@ -75,6 +75,9 @@ rutina_dibujar:
 	//r0 = count(letras)
 	//Z = &(letras[0])
 	lpm r8, Z+				; r8 = count(letras)
+	lsl r8
+	lsl r8
+	lsl r8					; r8 = ancho en pixeles del texto
 	
 	lpm r0, Z+
 
@@ -126,9 +129,9 @@ rutina_dibujar:
 	mov r0, r25
 	and r0, r31
 	add r24, r0
-	cpi r24, 128
+	cp r24, r8
 	brmi loop
-	subi r24, 128
+	sub r24, r8
 	loop:	tst r24
 			breq obtener_bit
 			dec r24
