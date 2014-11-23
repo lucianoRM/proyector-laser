@@ -126,6 +126,9 @@ rutina_dibujar:
 	mov r0, r25
 	and r0, r31
 	add r24, r0
+	cpi r24, 128
+	brmi loop
+	subi r24, 128
 	loop:	tst r24
 			breq obtener_bit
 			dec r24
