@@ -98,7 +98,12 @@ rutina_dibujar:
 		lsr r0
 		lsl r0
 		add r7, r0
+		//if r7 > cant_pixeles => r7 -= cant_pixeles
+		cp r7, r8
+		brmi loadZ
+		sub r7, r8
 		//Z += 2*floor(columna/8) + 2*floor(offsetColumna/8)
+loadZ:
 		clr r0
 		add r30, r7
 		adc r31, r0
