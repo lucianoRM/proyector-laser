@@ -21,3 +21,5 @@ asm/tp_labo_test_interruption/tp_labo_test_interruption.atsuo
 asm/tp_labo_test_timer/tp_labo_test_timer/Debug/*
 asm/tp_labo_test_timer/tp_labo_test_timer/Release/*
 asm/tp_labo_test_timer/tp_labo_test_timer.atsuo
+
+*.workspace

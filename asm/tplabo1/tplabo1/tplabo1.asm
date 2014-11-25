@@ -1,9 +1,4 @@
-/*
- * tplabo1.asm
- *
- *  Created: 08/11/2014 9:53:07
- *   Author: Carlos
- */ 
+// usa r0, r1, r2, r3, r4, r5, r6, r16, r17, r20, r21, r22, r23, r24
 
 .include "m328Pdef.inc"
 
@@ -19,34 +14,27 @@
 .include "tp_labo_letras.asm"
 
 main:
-	
+	sbi DDRC, 1	;configuro como salida el led rojo
+	sbi DDRC, 2	;configuro como salida el led verde
+
 	;inicializacion stack
 	ldi r20, high(RAMEND)
 	out SPH, r20
 	ldi r20, low(RAMEND)
 	out SPL, r20
 
-	call iniciar_fan
-	//call esperar_fan
+	call esperar_clock
 	call configurar_laser
 	call configurar_timer
 	call configurar_interrupcion
+	call iniciar_fan
 
 	;bucle principal, aca se ejecutan las interrupciones
 	main_loop:
 		jmp main_loop;
 
 ;---------- definicion de rutinas ----------
-;configura como salida y activa el motor
-iniciar_fan:
-
-	sbi DDRC, PIN_MOTOR; configuro como salida el bit del motor
-	sbi PORTC, PIN_MOTOR; prendo el motor
-
-	ret
-
-;rutina que espera que el fan tome velocidad
-esperar_fan:
+esperar_clock:
 	clr r1
 	clr r2
 	clr r16
@@ -57,8 +45,22 @@ esperar_fan:
 		inc r2
 		brne loop_esperar_fan
 		inc r16
-		cpi r16, 76
+		cpi r16, 10
 		brne loop_esperar_fan
+
+	; pongo el clock en 8MHz
+	ldi r16, 0b10000000
+	sts CLKPR, r16
+	clr r16
+	sts CLKPR, r16
+
+	ret
+
+;configura como salida y activa el motor
+iniciar_fan:
+
+	sbi DDRC, PIN_MOTOR; configuro como salida el bit del motor
+	sbi PORTC, PIN_MOTOR; prendo el motor
 
 	ret
 
@@ -72,6 +74,9 @@ configurar_laser:
 
 ;configura la interrupcion del sensor
 configurar_interrupcion:
+	clr r21			; limpio fila
+	clr r22			; limpio columna
+
 	;configuracion de interrupcion
 	;seteo la interrupcion externa para que se active con flanco ascendente
 	ldi r20, (1<<ISC01) | (1 <<ISC00)
@@ -90,15 +95,13 @@ configurar_interrupcion:
 configurar_timer:
 	;timer
 	;cargo valor inicial del timer en 1 (parte alta y baja)
-	ldi r20, 0x00
-	sts TCNT1H, r20
-	sts TCNT1L, r20
+	call reset_timer
 
-	;cargo la configuracion del timer 1, modo normal, sin prescaler
-	ldi r20, 0x00
+	;cargo la configuracion del timer 1, modo normal, prescaler = 1
+	clr r20
 	sts TCCR1A, r20
 
-	ldi r20, 1 << CS10
+	ldi r20, 1 << CS10; 
 	sts TCCR1B, r20
 
 	ldi r30,0 ; CONTADOR DE FILA
@@ -110,144 +113,151 @@ configurar_timer:
 reset_timer:
 	;timer
 	;cargo valor inicial del timer en 1 (parte alta y baja)
-	ldi r20, 0x00
-	sts TCNT1H, r20
-	sts TCNT1L, r20
+	clr r0
+	sts TCNT1H, r0
+	sts TCNT1L, r0
 
 	ret
 
-; prende y apaga el laser segun el valor actual del laser. No hace falta ret, pues viene de un jmp
-dibujar:
+; prende y apaga el laser segun el valor actual del laser.
+; en r21 debe estar el nro de fila
+; en r22 debe estar el nro de columna
+; en r3:r4 debe estar el tiempo en el cual se debe pasar a la prox columna
+dibujar_lado:
 
-	/*
-	t = tiempo que tarda en dar una vuelta		0 <= t <= 2^16				2 byte
-	t_prox_cambio = delta													2 byte			r23:r24
+	ldi r22, 127
 
-	delta = t / 8 / 128							0 <= delta <= 2^6			1 byte			r20
-												;dividimos por 8 lados y 128 pixeles por lado
-	fila = 0									0 <= fila <= 2^3 - 1		1 byte			r21
-	columna = 0									0 <= columna <= 2^7 - 1		1 byte			r22
+	// acomodo los offsets de acuerdo a la columna que trato, se toca viendo las filas en la imagen
+	cpi r21, 0
+	breq offset_fila_0
+	cpi r21, 1
+	breq offset_fila_1
+	cpi r21, 2
+	breq offset_fila_2
+	cpi r21, 3
+	breq offset_fila_3
+	cpi r21, 4
+	breq offset_fila_4
+	cpi r21, 5
+	breq offset_fila_5
+	cpi r21, 6
+	breq offset_fila_6
+	cpi r21, 7
+	breq offset_fila_7
 
-	while(fila < 2^3 && columna < 2^7)
+	// valores elegidos para los offsets, depende de la posición del espejo/imanes
+	offset_fila_0:
+		ldi r16, 2
+		jmp set_offset
+	offset_fila_1:
+		ldi r16, 5
+		jmp set_offset
+	offset_fila_2:
+		ldi r16, 4
+		jmp set_offset
+	offset_fila_3:
+		ldi r16, 4
+		jmp set_offset
+	offset_fila_4:
+		ldi r16, 1
+		jmp set_offset
+	offset_fila_5:
+		ldi r16, 1
+		jmp set_offset
+	offset_fila_6:
+		ldi r16, 2
+		jmp set_offset
+	offset_fila_7:
+		ldi r16, 4
+		jmp set_offset
 
-		dibujar_pixel(fila, columna) ; falta ver como skippear las primeras columnas y las ultimas por las dudas
+	set_offset:
+		sub r22, r16
 
-		if (timer_actual > t_prox_cambio)
-			columna++
-			t_prox_cambio += delta
+dibujar_columna:
+	mov r23, r21		; Pasaje de parámetros
+	mov r24, r22
+	jmp rutina_dibujar
+vuelta:
+	out PORTB, r0 // r0
 
-			if (columna == 2^7)
-				fila++
-				columna = 0
+check_time:
+	lds r18, TCNT1L
+	lds r19, TCNT1H
+	cp r19, r4				; HIGH(tActual) - HIGH(tPasarProxCol)
+	brmi check_time			; HIGH(tActual) < HIGH(tPasarProxCol) => Vuelvo a chequear
+	brpl proxima_columna	; HIGH(tActual) > HIGH(tPasarProxCol) => Prox columna
+							
+							; HIGH(tActual) == HIGH(tPasarProxCol)
+	cp r18,r3				; LOW(tActual) - LOW(tPasarProxCol)
+	brmi check_time			; LOW(tActual) < LOW(tPasarProxCol) => Vuelvo a chequear
+	jmp proxima_columna		; LOW(tActual) >= LOW(tPasarProxCol) => Prox columna
 
-	*/
+proxima_columna:
+	clr r0							; fijo nuevo límite de tiempo para la columna, sumando delta
+	add r3, r6						; LOW(tPasarProxCol) += delta
+	adc r4, r5						; HIGH(tPasarProxCol) += carry
 
-	;lds r20, ultima_duracion_vuelta_l innecesario
-	mov r20, r9
+	dec r22							; columna --
+	brpl dibujar_columna			; columna >= 0 => dibujar
 
-	; shift a la derecha 2 veces
-	lsr r20
-	lsr r20
-
-	; numero de fila
-	ldi r21, 0;
-	; numero de columna
-	ldi r22, 0;
-
-	; t_prox_cambio = delta
-	ldi r23, 0; alta
-	mov r24, r20; baja
-
-	
-
-
-	loop_dibujar:
-		/*sbrc r21, 3	; salteo si el bit 2 de la fila esta seteado
-		jmp dibujar_end*/
-
-		mov r1, r21					; pasaje de parametros
-		mov r2, r22
-		//jmp rutina_dibujar
-
-		vuelta:
-
-		; dibujar el pixel TODO, pasarle la fila y la columna
-		; deberia prender una fila y otra no
-		clr r0
-		mov r31,r30
-		lsr r31
-		lsr r31
-		lsr r31
-		lsr r31
-		
-		
-
-		cp r21, r31
-		breq print1
-print0:
-		out PORTB, r0
-		jmp esperar
-print1:
-		inc r0
-		out PORTB, r0
-
-esperar:
-		; obtengo el valor actual del timer
-		lds r17, TCNT1L
-		lds r16, TCNT1H
-
-		cp r23, r16
-		brmi mayor
-		brne esperar
-		cp r24, r17
-		brmi mayor
-		jmp esperar
-		
-		
-		/*cp r16, r23
-		brmi loop_dibujar ; si r16 - r23 < 0 => la parte alta de timer_actual es menor
-		brne mayor; si no es cero entonces ya puedo ver el contenido del if
-		cp r17, r24; caso en que las partes altas son iguales
-		brmi loop_dibujar; miro las partes bajas y las comparo*/
-
-		mayor:
-			inc r22; columna++
-
-			;t_prox_cambio += delta
-			ldi r25, 0
-			add r24, r20; sumo partes bajas
-			adc r23, r25; le sumo a la parte alta el carry de la sumas de la partes bajas
-
-			cpi r22, 128
-			brne loop_dibujar
-			; si columna == 2^7 == 128
-			inc r21; fila++
-			inc r29;
-			brne salto2;
-			inc r30; CONTADOR++
-		salto2:
-			ldi r22, 0; columna = 0
-			cpi r21, 8
-			breq dibujar_end
-
-		jmp loop_dibujar
-
-	; bucle por las dudas
-	dibujar_end:
-		clr r0
-		out PORTB, r0
-		jmp dibujar_end
+wait_for_interruption:
+	cbi PORTB, 0					; dejo de pintar
+	jmp wait_for_interruption
 
 ;---------- definicion de interrupciones ----------
 sensor:
+
+	;solo actualizo el tiempo entre los espejos una vez por vuelta si fila = 5
+	cpi r21, 5
+	brne continuar_igual
+
+	; si fila = 0, actualizo el valor del tiempo
 	; obtengo el valor actual del timer y actualizo
-	lds r8, TCNT1L;innecesario
-	lds r9, TCNT1H
+	lds r1, TCNT1L
+	lds r2, TCNT1H
+
+	continuar_igual:
 
 	; reseteo el timer
-	call reset_timer
+	clr r0
+	sts TCNT1H, r0
+	sts TCNT1L, r0
 	
-	sei
+	//r3:r4 contiene todo el tiempo el momento en el cual tengo que empezar a dibujar la prox columna
+	//r6:r5 contiene el tiempo a incrementar entre columnas
 
-	jmp dibujar
+	//necesito dividir por 128 = 2^7, me queda un bit en la parte alta, el resto en la parte baja
+	mov r5, r2
+	mov r6, r1
+	;aplico esto por 7 => OPTIMIZAR
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+	lsr r5
+	ror r6
+
+	; copio partes altas y bajas
+	mov r4, r5
+	mov r3, r6
+
+	inc r21 ; incremento numero de fila
+
+	cpi r21, 8
+	brmi continue			; si fila < 8 => seguir
+	clr r21					; si la fila == 8 => fila = 0
+	
+continue:
+
+	sei
+	jmp dibujar_lado
 	; reti ausente, acordarse de habilitar las interrupciones

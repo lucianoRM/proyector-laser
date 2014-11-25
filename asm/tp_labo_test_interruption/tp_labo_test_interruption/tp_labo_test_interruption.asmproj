@@ -26,14 +26,14 @@
     <BootSegment>2</BootSegment>
     <eraseonlaunchrule>1</eraseonlaunchrule>
     <AsfFrameworkConfig>
-      <framework-data xmlns="">
+      <framework-data>
   <options />
   <configurations />
   <files />
   <documentation help="" />
   <offline-documentation help="" />
   <dependencies>
-    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.19.0" />
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.6.0" />
   </dependencies>
 </framework-data>
     </AsfFrameworkConfig>
@@ -41,15 +41,15 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrAssembler>
-  <avrasm.assembler.general.IncludeFile>(%24IncludeFile)</avrasm.assembler.general.IncludeFile>
-</AvrAssembler>
+        <avrasm.assembler.general.IncludeFile>(%24IncludeFile)</avrasm.assembler.general.IncludeFile>
+      </AvrAssembler>
     </ToolchainSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
       <AvrAssembler>
-  <avrasm.assembler.general.IncludeFile>(%24IncludeFile)</avrasm.assembler.general.IncludeFile>
-</AvrAssembler>
+        <avrasm.assembler.general.IncludeFile>(%24IncludeFile)</avrasm.assembler.general.IncludeFile>
+      </AvrAssembler>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>

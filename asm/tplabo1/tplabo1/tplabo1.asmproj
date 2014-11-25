@@ -69,6 +69,12 @@
     <Compile Include="tplabo1.asm">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tplabo2.asm">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tplabooriginal.asm">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tp_labo_letras.asm">
       <SubType>Code</SubType>
     </Compile>
