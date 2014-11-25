@@ -10,15 +10,15 @@ cadena:
 	.db 16, 0x00				; len(text)
 	.dw letra_espacio			;0 padding para los offsets!
 	.dw letra_espacio			;1 padding para los offsets!
-	.dw letra_h					;2
+	.dw letra_s					;2
 	.dw letra_espacio			;3
-	.dw letra_o					;4
+	.dw letra_t					;4
 	.dw letra_espacio			;5
-	.dw letra_l					;6
+	.dw letra_o					;6
 	.dw letra_espacio			;7
-	.dw letra_a					;8
+	.dw letra_l					;8
 	.dw letra_espacio			;9
-	.dw letra_espacio			;10
+	.dw letra_a					;10
 	.dw letra_espacio			;11
 	.dw letra_espacio			;12
 	.dw letra_espacio			;13
@@ -38,13 +38,17 @@ letra_a:
 letra_b:
 	.db 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11111111
 letra_c:
-	.db 0b11111111, 0b11111111, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11111111, 0b11111111
+	.db 0b11111111,	0b11111111, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11111111, 0b11111111
 letra_h:
 	.db 0b11000011, 0b11000011, 0b11000011, 0b11111111, 0b11111111, 0b11000011, 0b11000011, 0b11000011
-letra_o:
-	.db 0b11111111, 0b11111111, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11111111, 0b11111111
 letra_l:
 	.db 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11111111, 0b11111111
+letra_o:
+	.db 0b11111111, 0b11111111, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11111111, 0b11111111
+letra_s:
+	.db 0b11111111,	0b11000000, 0b11000000, 0b11111111, 0b11111111, 0b00000011, 0b00000011, 0b11111111
+letra_t:
+	.db 0b11111111, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000
 letra_exclamacion:
 	.db 0b00111100, 0b00111100, 0b00111100, 0b00111100, 0b00000000, 0b00000000, 0b00111100, 0b00111100
 letra_punteada:

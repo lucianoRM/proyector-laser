@@ -1,4 +1,4 @@
-// usa r0, r1, r2, r3, r4, r5, r6, r16, r17, r20, r21, r22, r23, r24
+// usa r0, r1, r2, r3, r4, r5, r6, r9, r16, r17, r20, r21, r22, r23, r24
 
 .include "m328Pdef.inc"
 
@@ -31,6 +31,7 @@ main:
 
 	;bucle principal, aca se ejecutan las interrupciones
 	main_loop:
+		sbi PORTC, 2
 		jmp main_loop;
 
 ;---------- definicion de rutinas ----------
@@ -62,6 +63,9 @@ iniciar_fan:
 	sbi DDRC, PIN_MOTOR; configuro como salida el bit del motor
 	sbi PORTC, PIN_MOTOR; prendo el motor
 
+	;habilito las interrupciones globalmente
+	sei
+
 	ret
 
 ;configura el laser
@@ -85,9 +89,6 @@ configurar_interrupcion:
 	;habilito la interrupción INT0 (PORTD2)
 	ldi r20, 1 << INT0
 	out EIMSK, r20
-	
-	;habilito las interrupciones globalmente
-	sei
 
 	ret
 
@@ -125,7 +126,7 @@ reset_timer:
 ; en r3:r4 debe estar el tiempo en el cual se debe pasar a la prox columna
 dibujar_lado:
 
-	ldi r22, 127
+	ldi r22, 120
 
 	// acomodo los offsets de acuerdo a la columna que trato, se toca viendo las filas en la imagen
 	cpi r21, 0
@@ -203,10 +204,22 @@ proxima_columna:
 
 wait_for_interruption:
 	cbi PORTB, 0					; dejo de pintar
-	jmp wait_for_interruption
+	;jmp wait_for_interruption
+	clr r9
+	reti
 
 ;---------- definicion de interrupciones ----------
 sensor:
+	cbi PORTC, 2
+	tst r9
+	breq nohabiainterrupcion
+	sbi PORTC, 1					; prendo el led rojo
+	jmp finchequeointerrupcion
+nohabiainterrupcion:
+	cbi PORTC, 1					; apago el led rojo
+finchequeointerrupcion:
+	clr r9
+	inc r9
 
 	;solo actualizo el tiempo entre los espejos una vez por vuelta si fila = 5
 	cpi r21, 5
@@ -258,6 +271,6 @@ sensor:
 	
 continue:
 
-	sei
+	;sei
 	jmp dibujar_lado
 	; reti ausente, acordarse de habilitar las interrupciones
