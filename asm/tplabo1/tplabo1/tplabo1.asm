@@ -150,25 +150,25 @@ dibujar_lado:
 		ldi r16, 2
 		jmp set_offset
 	offset_fila_1:
-		ldi r16, 5
+		ldi r16, 6
 		jmp set_offset
 	offset_fila_2:
-		ldi r16, 4
+		ldi r16, 6
 		jmp set_offset
 	offset_fila_3:
 		ldi r16, 4
 		jmp set_offset
 	offset_fila_4:
-		ldi r16, 1
+		ldi r16, 0
 		jmp set_offset
 	offset_fila_5:
-		ldi r16, 1
+		ldi r16, 0
 		jmp set_offset
 	offset_fila_6:
 		ldi r16, 2
 		jmp set_offset
 	offset_fila_7:
-		ldi r16, 4
+		ldi r16, 6
 		jmp set_offset
 
 	set_offset:
