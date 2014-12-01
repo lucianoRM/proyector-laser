@@ -14,6 +14,7 @@
 .include "tp_labo_letras.asm"
 
 main:
+	clr r25
 	sbi DDRC, 1	;configuro como salida el led rojo
 	sbi DDRC, 2	;configuro como salida el led verde
 
@@ -46,7 +47,7 @@ esperar_clock:
 		inc r2
 		brne loop_esperar_fan
 		inc r16
-		cpi r16, 10
+		cpi r16, 5
 		brne loop_esperar_fan
 
 	; pongo el clock en 8MHz
@@ -126,7 +127,7 @@ reset_timer:
 ; en r3:r4 debe estar el tiempo en el cual se debe pasar a la prox columna
 dibujar_lado:
 
-	ldi r22, 120
+	ldi r22, 128
 
 	// acomodo los offsets de acuerdo a la columna que trato, se toca viendo las filas en la imagen
 	cpi r21, 0
@@ -200,6 +201,7 @@ proxima_columna:
 	adc r4, r5						; HIGH(tPasarProxCol) += carry
 
 	dec r22							; columna --
+	cpi r22, 10
 	brpl dibujar_columna			; columna >= 0 => dibujar
 
 wait_for_interruption:
@@ -267,6 +269,11 @@ finchequeointerrupcion:
 
 	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
+	inc r25
+	cpi r25, 128
+	brmi noMod3
+	clr r25
+	noMod3:
 	clr r21					; si la fila == 8 => fila = 0
 	
 continue:
