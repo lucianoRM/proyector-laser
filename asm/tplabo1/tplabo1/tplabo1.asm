@@ -24,6 +24,7 @@ main:
 	ldi r20, low(RAMEND)
 	out SPL, r20
 
+	call preparar_dibujar
 	call esperar_clock
 	call configurar_laser
 	call configurar_timer
@@ -70,6 +71,7 @@ iniciar_fan:
 	ret
 
 ;configura el laser
+
 configurar_laser:
 
 	sbi DDRB, PIN_LASER;configura como salida el laser
@@ -179,7 +181,11 @@ dibujar_lado:
 dibujar_columna:
 	mov r23, r21		; Pasaje de parámetros
 	mov r24, r22
+	cpi r24, 95
+	brpl sacar0
 	jmp rutina_dibujar
+sacar0:
+	clr r0
 vuelta:
 	out PORTB, r0 // r0
 
@@ -270,10 +276,16 @@ finchequeointerrupcion:
 	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
 	inc r25
-	cpi r25, 128
+	lsl r8
+	lsl r8
+	lsl r8
+	cp r25, r8
 	brmi noMod3
 	clr r25
 	noMod3:
+	lsr r8
+	lsr r8
+	lsr r8
 	clr r21					; si la fila == 8 => fila = 0
 	
 continue:

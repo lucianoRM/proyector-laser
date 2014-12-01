@@ -1,16 +1,14 @@
-/*
- * tp_labo_letras.asm
- *
- *  Created: 14/11/2014 17:48:56
- *   Author: Carlos
- */ 
+
+
+
+
+
 
 //la cadena y las letras van en orden normal!
 cadena:
-	.db 16, 0x00				; len(text)
+	.db 16, 0x00				; len(text) --- max = 31
 	.dw letra_espacio			;0 padding para los offsets!
 	.dw letra_espacio			;1 padding para los offsets!
-	/*
 	.dw letra_a					;2
 	.dw letra_espacio
 	.dw letra_b			;3
@@ -25,8 +23,7 @@ cadena:
 	.dw letra_espacio
 	.dw letra_g					;8
 	.dw letra_espacio
-	*/
-	.dw letra_h			;9
+	/*.dw letra_h			;9
 	.dw letra_espacio
 	.dw letra_i					;10
 	.dw letra_espacio
@@ -40,7 +37,33 @@ cadena:
 	.dw letra_espacio
 	.dw letra_t			;15
 	.dw letra_espacio
-	//clr r0
+	.dw letra_m			;9
+	.dw letra_espacio
+	.dw letra_n					;10
+	.dw letra_espacio
+	.dw letra_o			;11
+	.dw letra_espacio
+	.dw letra_p			;12
+	.dw letra_espacio
+	.dw letra_q			;13
+	.dw letra_espacio
+	.dw letra_r		;14
+	.dw letra_espacio
+	.dw letra_s			;15
+	.dw letra_espacio
+	.dw letra_t			;15
+	.dw letra_espacio
+	.dw letra_u			;15
+	.dw letra_espacio
+	.dw letra_v			;15
+	.dw letra_espacio
+	.dw letra_x			;15
+	.dw letra_espacio
+	.dw letra_y			;15
+	.dw letra_espacio
+	.dw letra_z			;15
+	.dw letra_espacio
+	*/
 letra_impar:
 	.db 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111
 letra_par:
@@ -71,12 +94,32 @@ letra_j:
 	.db 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b11111100
 letra_l:
 	.db 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11111111, 0b11111111
+letra_m:
+	.db 0b11000011, 0b11100111, 0b11011011, 0b11011011, 0b11000011, 0b11000011, 0b11000011, 0b11000011
+letra_n:
+	.db 0b10000001, 0b11000001, 0b10100001, 0b10010001, 0b10001001, 0b10000101, 0b10000011, 0b10000001
 letra_o:
-	.db 0b11111111, 0b11111111, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11111111, 0b11111111
+	.db 0b11111111, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11111111
+letra_p:
+	.db 0b11111100, 0b10000010, 0b10000001, 0b10000010, 0b11111100, 0b10000000, 0b10000000, 0b10000000
+letra_q:
+	.db 0b11111111, 0b11000011, 0b11000011, 0b11000011, 0b11010011, 0b11001011, 0b11000011, 0b11111111
+letra_r:
+	.db 0b11111100, 0b10000010, 0b10000001, 0b10000010, 0b11111100, 0b11100000, 0b10001100, 0b10000011
 letra_s:
 	.db 0b11111111,	0b11000000, 0b11000000, 0b11111111, 0b11111111, 0b00000011, 0b00000011, 0b11111111
 letra_t:
 	.db 0b11111111, 0b11111111, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000
+letra_u:
+	.db 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b01000010, 0b00111100
+letra_v:
+	.db 0b11000011, 0b11000011, 0b11000011, 0b01100110, 0b01100110, 0b01100110, 0b00111100, 0b00011000
+letra_x:
+	.db 0b11000011, 0b01100110, 0b00111100, 0b00011000, 0b00011000, 0b00111100, 0b01100110, 0b11000011
+letra_y:
+	.db 0b11000011, 0b01100110, 0b00111100, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000
+letra_z:
+	.db 0b11111111, 0b00000011, 0b00000110, 0b00001100, 0b01111110, 0b00110000, 0b01100000, 0b11111111
 letra_exclamacion:
 	.db 0b00111100, 0b00111100, 0b00111100, 0b00111100, 0b00000000, 0b00000000, 0b00111100, 0b00111100
 letra_punteada:
@@ -95,10 +138,9 @@ function dibujar (fila, columna, offsetColumna) {
 //r0 = bit on/off para el laser
 //r23 = fila, r24 = columna, r25 = offsetColumna
 //utiliza r0, r8, r7, r23, r24, r25, r28, r29, r30, r31
-rutina_dibujar:
+preparar_dibujar:
 	; Como se imprime de derecha a izquierda, cuando nos piden la columna 0 en realidad nos piden la 127
 	; Y cuando nos piden la columna 127 en realidad nos piden la 0
-
 
 	; Se shiftea uno hacia la izquierda para multiplicar por 2
 	; El direccionamiento de las etiquetas es a Word, o sea a 2 bytes
@@ -114,22 +156,47 @@ rutina_dibujar:
 	
 	lpm r0, Z+
 
+	mov r10, r30
+	mov r11, r31
 
-	//TODO offsetColumna
-	//Z += floor(offsetColumna / 8) + floor(columna / 8)
+	ret
+
+rutina_dibujar:
+	mov r30, r10
+	mov r31, r11
 	//Z = &(&letra_a_imprimir)
-		//r7 = 2*floor(columna/8) ;cada registro ocupa 2 bytes y cada letra tiene 8 pixeles de ancho
+
+		//r28:r29 = columna
 		mov r28, r24
+		clr r29
+		
+		//r28:r29 = columna + offsetColumna
+		clr r0
 		add r28, r25
-		lsr r28
-		lsr r28
-		lsr r28
-		lsl r28
-		cpi r28, 32		; if r28 >= cant_letras * 2
+		adc r29, r0
+		
+		//divido por 8 pixeles que tiene cada letra
+		//r28:r29 = (columna + offsetColumna) / 8 = offsetLetra
+		lsr r29
+		ror r28
+		lsr r29
+		ror r28
+		lsr r29
+		ror r28
+
+		//cant_letras < 32 => offsetColumna < 256 y columna < 128 => (offsetColumna+columna)/8 < 48
+		//puedo usar solo la parte baja = r28
+		
+		//if offsetLetra >= cant_letras => offsetLetra -= cant_letras
+		cp r28, r8
 		brmi noMod
-		subi r28, 32	; r28 -= 32
+		sub r28, r8
 		noMod:
-		//Z += 2*floor(columna/8)
+
+		//r28 = offsetLetraEnWords = offsetLetra * 2
+		lsl r28
+
+		//Z += offsetLetraEnWords
 		clr r0
 		add r30, r28
 		adc r31, r0
@@ -137,9 +204,9 @@ rutina_dibujar:
 	//r28:r29 = &letra_a_imprimir
 		lpm r28, Z+				; r28 <- LOW(&letra_a_imprimir)
 		lpm r29, Z+				; r29 <- HIGH(&letra_a_imprimir)
-		//r28:r29 = &letra_a_imprimir ;direccionamiento a word => direccionamiento a byte
+		;direccionamiento a word => direccionamiento a byte
 		lsl r28
-		lsl r29
+		rol r29
 
 	//Z = &letra_a_imprimir
 	mov r30,r28
@@ -150,11 +217,10 @@ rutina_dibujar:
 	add r30,r23
 	adc r31,r0
 
-	//r8 = fila_letra_a_imprimir
-	lpm r8, Z
+	//r7 = fila_letra_a_imprimir
+	lpm r7, Z
 
-	//TODO offsetColumna
-	//bit = r8[columna mod 8 + offsetColumna mod 8]
+	//bit = r7[columna mod 8 + offsetColumna mod 8]
 	ldi r31, 0b00000111
 	and r24, r31
 	mov r28, r25
@@ -167,10 +233,10 @@ rutina_dibujar:
 	loop:	tst r24
 			breq obtener_bit
 			dec r24
-			lsl r8
+			lsl r7
 			jmp loop
 	obtener_bit:
 			clr r0
-			sbrc r8, 7
+			sbrc r7, 7
 			inc r0
 	jmp vuelta
