@@ -130,7 +130,7 @@ reset_timer:
 ; en r3:r4 debe estar el tiempo en el cual se debe pasar a la prox columna
 dibujar_lado:
 
-	ldi r22, 128
+	ldi r22, 127
 
 	// acomodo los offsets de acuerdo a la columna que trato, se toca viendo las filas en la imagen
 	cpi r21, 0
@@ -180,9 +180,7 @@ dibujar_lado:
 		sub r22, r16
 
 dibujar_columna:
-	mov r23, r21		; Pasaje de parámetros
-	mov r24, r22
-	cpi r24, 95
+	cpi r22, 95
 	brpl sacar0
 	jmp rutina_dibujar
 sacar0:
@@ -276,17 +274,24 @@ finchequeointerrupcion:
 
 	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
-	inc r25
-	lsl r12
-	lsl r12
-	lsl r12
-	cp r25, r12
-	brmi noMod3
+	
+	//Incremento offset
+	clr r0
+	clr r27
+	inc r0
+	add r25, r0
+	adc r26, r27
+
+	cp r26, r15
+	brmi noLimpiarOffset
+	brpl limpiarOffset
+	cp r25, r14
+	brmi noLimpiarOffset
+	limpiarOffset:
 	clr r25
-	noMod3:
-	lsr r12
-	lsr r12
-	lsr r12
+	clr r26
+	noLimpiarOffset:
+	
 	clr r21					; si la fila == 8 => fila = 0
 	
 continue:

@@ -152,6 +152,16 @@ preparar_dibujar:
 	
 	lpm r12, Z+				; r12:r13 = cant_letras
 	lpm r13, Z+
+
+	mov r14, r12
+	mov r15, r13
+
+	lsl r14
+	rol r15
+	lsl r14
+	rol r15
+	lsl r14
+	rol r15
 	
 	mov r10, r30
 	mov r11, r31
@@ -170,6 +180,8 @@ rutina_dibujar:
 		//r28:r29 = columna + offsetColumna
 		add r28, r25
 		adc r29, r26
+
+		mov r23, r28
 		
 		//divido por 8 pixeles que tiene cada letra
 		//r28:r29 = (columna + offsetColumna) / 8 = offsetLetra
@@ -214,29 +226,34 @@ rutina_dibujar:
 
 	//Z = &fila_letra_a_imprimir = &letra_a_imprimir + fila
 	clr r0
-	add r30,r23
+	add r30,r21
 	adc r31,r0
 
-	//r7 = fila_letra_a_imprimir
-	lpm r7, Z
+	//r27 = fila_letra_a_imprimir
+	lpm r27, Z
 
-	//bit = r7[columna mod 8 + offsetColumna mod 8]
+	//bit = r27[columna mod 8 + offsetColumna mod 8]
 	ldi r31, 0b00000111
-	and r24, r31
-	mov r28, r25
+	
+	mov r28, r22
 	and r28, r31
-	add r24, r28
-	cpi r24, 8
-	brmi noMod2
-	subi r24, 8
-	noMod2:
-	loop:	tst r24
+
+	mov r29, r25
+	and r29, r31
+
+	add r28, r29
+
+	cpi r28, 8
+	brmi loop
+	subi r28, 8
+
+	loop:	tst r28
 			breq obtener_bit
-			dec r24
-			lsl r7
+			dec r28
+			lsl r27
 			jmp loop
 	obtener_bit:
 			clr r0
-			sbrc r7, 7
+			sbrc r27, 7
 			inc r0
 	jmp vuelta
