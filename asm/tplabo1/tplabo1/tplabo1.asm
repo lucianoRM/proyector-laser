@@ -49,7 +49,7 @@ esperar_clock:
 		inc r2
 		brne loop_esperar_fan
 		inc r16
-		cpi r16, 5
+		cpi r16, 3
 		brne loop_esperar_fan
 
 	; pongo el clock en 8MHz
@@ -275,23 +275,21 @@ finchequeointerrupcion:
 	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
 	
-	//Incremento offset
 	clr r0
-	clr r27
 	inc r0
+	clr r24
 	add r25, r0
-	adc r26, r27
-
+	adc r26, r24
+	
 	cp r26, r15
 	brmi noLimpiarOffset
-	brpl limpiarOffset
+	brne limpiarOffset
 	cp r25, r14
 	brmi noLimpiarOffset
 	limpiarOffset:
-	clr r25
+	ldi r25, 128
 	clr r26
 	noLimpiarOffset:
-	
 	clr r21					; si la fila == 8 => fila = 0
 	
 continue:
