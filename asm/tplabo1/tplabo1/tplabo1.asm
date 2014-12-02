@@ -4,6 +4,7 @@
 
 .equ PIN_LASER = 0;(PORTB0)
 .equ PIN_MOTOR = 0;(PORTC0)
+.equ VELOCIDAD = 2
 
 .org 0					;jump al programa principal
 	jmp main
@@ -152,16 +153,16 @@ dibujar_lado:
 
 	// valores elegidos para los offsets, depende de la posición del espejo/imanes
 	offset_fila_0:
-		ldi r16, 2
+		ldi r16, 4
 		jmp set_offset
 	offset_fila_1:
-		ldi r16, 6
+		ldi r16, 7
 		jmp set_offset
 	offset_fila_2:
-		ldi r16, 6
+		ldi r16, 7
 		jmp set_offset
 	offset_fila_3:
-		ldi r16, 4
+		ldi r16, 5
 		jmp set_offset
 	offset_fila_4:
 		ldi r16, 0
@@ -275,10 +276,9 @@ finchequeointerrupcion:
 	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
 	
-	clr r0
-	inc r0
+	ldi r27, VELOCIDAD
 	clr r24
-	add r25, r0
+	add r25, r27
 	adc r26, r24
 	
 	cp r26, r15

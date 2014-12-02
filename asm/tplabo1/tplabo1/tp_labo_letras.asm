@@ -6,7 +6,7 @@
 
 //la cadena y las letras van en orden normal!
 cadena:
-	.dw 84					; len(text) --- min = 32 max = 8176
+	.dw 118					; len(text) --- min = 32 max = 8176
 	.dw letra_espacio
 	.dw letra_espacio
 	.dw letra_espacio
@@ -23,7 +23,7 @@ cadena:
 	.dw letra_espacio
 	.dw letra_espacio
 	.dw letra_espacio			// OBLIGATORIO
-	.dw letra_espacio	;0 padding para los offsets!
+	/*.dw letra_espacio	;0 padding para los offsets!
 	.dw letra_espacio			;1 padding para los offsets!
 	.dw letra_a					;2
 	.dw letra_espacio
@@ -76,7 +76,102 @@ cadena:
 	.dw letra_y			;15
 	.dw letra_espacio
 	.dw letra_z			;15
-	.dw letra_espacio
+	.dw letra_espacio*/
+    
+
+
+
+
+
+        .dw letra_t
+    .dw letra_espacio
+    .dw letra_h
+    .dw letra_espacio
+    .dw letra_e
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_q
+    .dw letra_espacio
+    .dw letra_u
+    .dw letra_espacio
+    .dw letra_i
+    .dw letra_espacio
+    .dw letra_c
+    .dw letra_espacio
+    .dw letra_k
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_b
+    .dw letra_espacio
+    .dw letra_r
+    .dw letra_espacio
+    .dw letra_o
+    .dw letra_espacio
+    .dw letra_w
+    .dw letra_espacio
+    .dw letra_n
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_f
+    .dw letra_espacio
+    .dw letra_o
+    .dw letra_espacio
+    .dw letra_x
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_j
+    .dw letra_espacio
+    .dw letra_u
+    .dw letra_espacio
+    .dw letra_m
+    .dw letra_espacio
+    .dw letra_p
+    .dw letra_espacio
+    .dw letra_s
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_o
+    .dw letra_espacio
+    .dw letra_v
+    .dw letra_espacio
+    .dw letra_e
+    .dw letra_espacio
+    .dw letra_r
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_t
+    .dw letra_espacio
+    .dw letra_h
+    .dw letra_espacio
+    .dw letra_e
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_l
+    .dw letra_espacio
+    .dw letra_a
+    .dw letra_espacio
+    .dw letra_z
+    .dw letra_espacio
+    .dw letra_y
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_espacio
+    .dw letra_d
+    .dw letra_espacio
+    .dw letra_o
+    .dw letra_espacio
+    .dw letra_g
+    .dw letra_espacio
+
+
+
 	.dw letra_espacio	//OBLIGATORIO
 	.dw letra_espacio
 	.dw letra_espacio
@@ -104,9 +199,9 @@ letra_bloque:
 letra_a:
 	.db 0b11111111, 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11111111, 0b11000011, 0b11000011
 letra_b:
-	.db 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11000011, 0b11000011, 0b11111111, 0b11111111
+	.db 0b11111110, 0b10000010, 0b10000010, 0b11111100, 0b10000010, 0b10000010, 0b10000010, 0b11111100
 letra_c:
-	.db 0b11111111,	0b11111111, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11111111, 0b11111111
+	.db 0b01111111,	0b11111111, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11111111, 0b01111111
 letra_d:
 	.db 0b11111100, 0b10000010, 0b10000001, 0b10000001, 0b10000001, 0b10000001, 0b10000010, 0b11111100
 letra_e:
@@ -114,7 +209,7 @@ letra_e:
 letra_f:
 	.db 0b11111111, 0b11111111, 0b10000000, 0b11111000, 0b11111000, 0b10000000, 0b10000000, 0b10000000
 letra_g:
-	.db 0b11111111, 0b11111111, 0b10000000, 0b11111111, 0b11111111, 0b10000111, 0b11111111, 0b11111111
+	.db 0b01111100, 0b10000000, 0b10000000, 0b10000000, 0b10001110, 0b10000010, 0b10000010, 0b01111100
 letra_h:
 	.db 0b11000011, 0b11000011, 0b11000011, 0b11111111, 0b11111111, 0b11000011, 0b11000011, 0b11000011
 letra_i:
@@ -130,7 +225,7 @@ letra_m:
 letra_n:
 	.db 0b10000001, 0b11000001, 0b10100001, 0b10010001, 0b10001001, 0b10000101, 0b10000011, 0b10000001
 letra_o:
-	.db 0b11111111, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11111111
+	.db 0b01111110, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b01111110
 letra_p:
 	.db 0b11111100, 0b10000010, 0b10000001, 0b10000010, 0b11111100, 0b10000000, 0b10000000, 0b10000000
 letra_q:
