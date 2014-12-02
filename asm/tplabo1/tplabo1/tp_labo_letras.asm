@@ -4,11 +4,26 @@
 
 
 
-
 //la cadena y las letras van en orden normal!
 cadena:
-	.dw 8					; len(text) --- max = 8176
-	.dw letra_exclamacion	;0 padding para los offsets!
+	.dw 84					; len(text) --- min = 32 max = 8176
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio			// OBLIGATORIO
+	.dw letra_espacio	;0 padding para los offsets!
 	.dw letra_espacio			;1 padding para los offsets!
 	.dw letra_a					;2
 	.dw letra_espacio
@@ -16,7 +31,7 @@ cadena:
 	.dw letra_espacio
 	.dw letra_c					;4
 	.dw letra_espacio
-	/*.dw letra_d			;5
+	.dw letra_d			;5
 	.dw letra_espacio
 	.dw letra_e					;6
 	.dw letra_espacio
@@ -29,6 +44,8 @@ cadena:
 	.dw letra_i					;10
 	.dw letra_espacio
 	.dw letra_j			;11
+	.dw letra_espacio
+	.dw letra_k			;11
 	.dw letra_espacio
 	.dw letra_l			;12
 	.dw letra_espacio
@@ -52,13 +69,30 @@ cadena:
 	.dw letra_espacio
 	.dw letra_v			;15
 	.dw letra_espacio
+	.dw letra_w			;15
+	.dw letra_espacio
 	.dw letra_x			;15
 	.dw letra_espacio
 	.dw letra_y			;15
 	.dw letra_espacio
 	.dw letra_z			;15
 	.dw letra_espacio
-	*/
+	.dw letra_espacio	//OBLIGATORIO
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
+	.dw letra_espacio
 letra_impar:
 	.db 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000, 0b11111111
 letra_par:
@@ -87,6 +121,8 @@ letra_i:
 	.db 0b11111111, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b00011000, 0b11111111
 letra_j:
 	.db 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b00001110, 0b11111100
+letra_k:
+	.db 0b11100011, 0b11100111, 0b11111100, 0b11111000, 0b11111000, 0b11111100, 0b11100111, 0b11100011
 letra_l:
 	.db 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11000000, 0b11111111, 0b11111111
 letra_m:
@@ -109,6 +145,8 @@ letra_u:
 	.db 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b11000011, 0b01000010, 0b00111100
 letra_v:
 	.db 0b11000011, 0b11000011, 0b11000011, 0b01100110, 0b01100110, 0b01100110, 0b00111100, 0b00011000
+letra_w:
+	.db 0b10000001, 0b10000001, 0b10000001, 0b10001001, 0b10001001, 0b11011011, 0b01011010, 0b01111110
 letra_x:
 	.db 0b11000011, 0b01100110, 0b00111100, 0b00011000, 0b00011000, 0b00111100, 0b01100110, 0b11000011
 letra_y:
@@ -116,7 +154,7 @@ letra_y:
 letra_z:
 	.db 0b11111111, 0b00000011, 0b00000110, 0b00001100, 0b01111110, 0b00110000, 0b01100000, 0b11111111
 letra_exclamacion:
-	.db 0b00111100, 0b00111100, 0b00000000, 0b00000000, 0b00111100, 0b00111100, 0b00111100, 0b00111100
+	.db 0b00111100, 0b00111100, 0b00111100, 0b00111100, 0b00000000, 0b00000000, 0b00111100, 0b00111100
 letra_punteada:
 	.db 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010, 0b10101010
 
