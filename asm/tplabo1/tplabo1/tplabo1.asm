@@ -15,6 +15,7 @@
 
 main:
 	clr r25
+	clr r26
 	sbi DDRC, 1	;configuro como salida el led rojo
 	sbi DDRC, 2	;configuro como salida el led verde
 
@@ -276,16 +277,16 @@ finchequeointerrupcion:
 	cpi r21, 8
 	brmi continue			; si fila < 8 => seguir
 	inc r25
-	lsl r8
-	lsl r8
-	lsl r8
-	cp r25, r8
+	lsl r12
+	lsl r12
+	lsl r12
+	cp r25, r12
 	brmi noMod3
 	clr r25
 	noMod3:
-	lsr r8
-	lsr r8
-	lsr r8
+	lsr r12
+	lsr r12
+	lsr r12
 	clr r21					; si la fila == 8 => fila = 0
 	
 continue:

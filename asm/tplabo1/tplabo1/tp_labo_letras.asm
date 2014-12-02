@@ -6,7 +6,7 @@
 
 //la cadena y las letras van en orden normal!
 cadena:
-	.db 16, 0x00				; len(text) --- max = 31
+	.db 16, 0					; low(len(text)):high(len(text)) --- max = 8176
 	.dw letra_espacio			;0 padding para los offsets!
 	.dw letra_espacio			;1 padding para los offsets!
 	.dw letra_a					;2
@@ -150,12 +150,9 @@ preparar_dibujar:
 	ldi ZH, high(cadena<<1)
 	ldi ZL, low(cadena<<1)
 	
-	//r0 = count(letras)
-	//Z = &(letras[0])
-	lpm r8, Z+				; r8 = count(letras)
+	lpm r12, Z+				; r12:r13 = cant_letras
+	lpm r13, Z+
 	
-	lpm r0, Z+
-
 	mov r10, r30
 	mov r11, r31
 
@@ -167,13 +164,12 @@ rutina_dibujar:
 	//Z = &(&letra_a_imprimir)
 
 		//r28:r29 = columna
-		mov r28, r24
+		mov r28, r22
 		clr r29
 		
 		//r28:r29 = columna + offsetColumna
-		clr r0
 		add r28, r25
-		adc r29, r0
+		adc r29, r26
 		
 		//divido por 8 pixeles que tiene cada letra
 		//r28:r29 = (columna + offsetColumna) / 8 = offsetLetra
@@ -184,22 +180,26 @@ rutina_dibujar:
 		lsr r29
 		ror r28
 
-		//cant_letras < 32 => offsetColumna < 256 y columna < 128 => (offsetColumna+columna)/8 < 48
-		//puedo usar solo la parte baja = r28
+		//cant_letras < 8176 => offsetColumna < 65408 y columna < 128 => (offsetColumna+columna)/8 < 8192
 		
 		//if offsetLetra >= cant_letras => offsetLetra -= cant_letras
-		cp r28, r8
-		brmi noMod
-		sub r28, r8
-		noMod:
+		cp r29, r13
+		brmi noOverflowOffset
+		brpl overflowOffset
+		cp r28, r12
+		brmi noOverflowOffset
+		overflowOffset:
+			sub r28, r12
+			sbc r29, r13
+		noOverflowOffset:
 
-		//r28 = offsetLetraEnWords = offsetLetra * 2
+		//r28:r29 = offsetLetraEnWords = offsetLetra * 2
 		lsl r28
+		rol r29
 
 		//Z += offsetLetraEnWords
-		clr r0
 		add r30, r28
-		adc r31, r0
+		adc r31, r29
 
 	//r28:r29 = &letra_a_imprimir
 		lpm r28, Z+				; r28 <- LOW(&letra_a_imprimir)
