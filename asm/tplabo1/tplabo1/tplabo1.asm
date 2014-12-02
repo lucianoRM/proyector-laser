@@ -4,7 +4,7 @@
 
 .equ PIN_LASER = 0;(PORTB0)
 .equ PIN_MOTOR = 0;(PORTC0)
-.equ VELOCIDAD = 2
+.equ VELOCIDAD = 1
 
 .org 0					;jump al programa principal
 	jmp main
